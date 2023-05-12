@@ -1,0 +1,369 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Cards {
+  id          Int        @id @default(autoincrement())
+  nameCard    String
+  type        String
+  description String
+  publishedAt DateTime?
+  steps       Json
+  typeCard    Int
+  whoDoing    Int?
+  clientId    Int
+  dueDate     DateTime
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime
+  companiesId Int?
+  Companies   Companies? @relation(fields: [companiesId], references: [id])
+  Tables      Tables     @relation(fields: [typeCard], references: [id], onDelete: Cascade)
+  Employee    Employee?  @relation(fields: [whoDoing], references: [id], onDelete: Cascade)
+}
+
+model Client {
+  id           Int         @id @default(autoincrement())
+  name         String
+  document     String
+  documentType String
+  phone        String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime?
+  userId       Int
+  User         User        @relation(fields: [userId], references: [id])
+  Companies    Companies[]
+  Payments     Payments[]
+}
+
+model Companies {
+  id               Int                @id @default(autoincrement())
+  companyName      String
+  document         String
+  documentType     String
+  clientId         Int?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  Cards            Cards[]
+  Client           Client?            @relation(fields: [clientId], references: [id])
+  ContratedService ContratedService[]
+  Payments         Payments[]
+}
+
+model ContratedService {
+  id                   Int                    @id @default(autoincrement())
+  companiesId          Int
+  Companies            Companies              @relation(fields: [companiesId], references: [id])
+  LogoContratedItems   LogoContratedItems[]
+  SiteContratedItems   SiteContratedItems[]
+  SocialContratedItems SocialContratedItems[]
+}
+
+model Employee {
+  id           Int       @id @default(autoincrement())
+  name         String
+  documentType String
+  document     String
+  phone        String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime?
+  userId       Int?
+  Cards        Cards[]
+  User         User?     @relation(fields: [userId], references: [id])
+}
+
+model Errors {
+  id        Int      @id @default(autoincrement())
+  errorCode Int
+  message   String
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+model Lead {
+  id          Int       @id @default(autoincrement())
+  name        String
+  email       String    @unique
+  phone       String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  subscribeAt DateTime?
+}
+
+model LogoBriefing {
+  id             Int                 @id
+  format         FormatStyles
+  cores          Json
+  typography     String?
+  especification EspecificationTypes
+  description    String?
+  references     String?
+  mockups        String?
+  LogoService    LogoService         @relation(fields: [id], references: [id])
+
+  @@index([id])
+}
+
+model LogoContratedItems {
+  id                 Int              @id @default(autoincrement())
+  contratedServiceId Int
+  logoServiceId      Int
+  ContratedService   ContratedService @relation(fields: [contratedServiceId], references: [id])
+  LogoService        LogoService      @relation(fields: [logoServiceId], references: [id])
+}
+
+model LogoService {
+  id                 Int                  @id @default(autoincrement())
+  status             LogoStatus
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  dueDate            DateTime?
+  serviceTypeId      Int?                 @default(3)
+  LogoBriefing       LogoBriefing?
+  LogoContratedItems LogoContratedItems[]
+  ServiceType        ServiceType?         @relation(fields: [serviceTypeId], references: [id])
+}
+
+model Packages {
+  id               Int                @id @default(autoincrement())
+  name             String
+  price            Float
+  description      String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  dueDate          DateTime?
+  PackagesServices PackagesServices[]
+}
+
+model PackagesServices {
+  id        Int      @id @default(autoincrement())
+  packageId Int
+  serviceId Int
+  Packages  Packages @relation(fields: [packageId], references: [id])
+  Service   Service  @relation(fields: [serviceId], references: [id])
+}
+
+model Payments {
+  id          Int           @id @default(autoincrement())
+  clientId    Int
+  companiesId Int
+  value       Float
+  discount    Float?
+  voucherId   Int?
+  status      PaymentStatus
+  logGateway  Json
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime
+  Client      Client        @relation(fields: [clientId], references: [id])
+  Companies   Companies     @relation(fields: [companiesId], references: [id])
+}
+
+model RoleType {
+  id   Int    @id @default(autoincrement())
+  name String
+  User User[]
+}
+
+model Service {
+  id               Int                @id @default(autoincrement())
+  name             String
+  price            Float
+  description      String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  serviceTypeId    Int
+  PackagesServices PackagesServices[]
+  ServiceType      ServiceType        @relation(fields: [serviceTypeId], references: [id])
+}
+
+model ServiceType {
+  id            Int             @id @default(autoincrement())
+  name          String
+  LogoService   LogoService[]
+  Service       Service[]
+  SiteService   SiteService[]
+  SocialService SocialService[]
+}
+
+model SiteBriefing {
+  id          Int         @id
+  siteModel   SiteModels
+  url         String?
+  references  Json?
+  logo        String?
+  contactData String?
+  socialMidia String?
+  SiteService SiteService @relation(fields: [id], references: [id])
+
+  @@index([id])
+}
+
+model SiteContratedItems {
+  id                 Int              @id @default(autoincrement())
+  contratedServiceId Int
+  siteServiceId      Int
+  ContratedService   ContratedService @relation(fields: [contratedServiceId], references: [id])
+  SiteService        SiteService      @relation(fields: [siteServiceId], references: [id])
+}
+
+model SiteService {
+  id                 Int                  @id @default(autoincrement())
+  status             SiteStatus
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  dueDate            DateTime?
+  serviceTypeId      Int?                 @default(1)
+  SiteBriefing       SiteBriefing?
+  SiteContratedItems SiteContratedItems[]
+  ServiceType        ServiceType?         @relation(fields: [serviceTypeId], references: [id])
+}
+
+model SocialBriefing {
+  id            Int                 @id
+  networkType   NetworkTypes
+  serviceType   SocialServiceTypes
+  imageBase     SocialImageBase
+  materialQuant SocialMaterialQuant
+  daysHours     String
+  mediaFormat   MediaFormat
+  SocialService SocialService       @relation(fields: [id], references: [id])
+
+  @@index([id])
+}
+
+model SocialContratedItems {
+  id                 Int              @id @default(autoincrement())
+  contratedServiceId Int
+  socialServiceId    Int
+  ContratedService   ContratedService @relation(fields: [contratedServiceId], references: [id])
+  SocialService      SocialService    @relation(fields: [socialServiceId], references: [id])
+}
+
+model SocialService {
+  id                   Int                    @id @default(autoincrement())
+  status               SocialStatus
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  dueDate              DateTime?
+  serviceTypeId        Int?                   @default(2)
+  SocialBriefing       SocialBriefing?
+  SocialContratedItems SocialContratedItems[]
+  ServiceType          ServiceType?           @relation(fields: [serviceTypeId], references: [id])
+}
+
+model Tables {
+  id        Int      @id @default(autoincrement())
+  tabName   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  Cards     Cards[]
+}
+
+model User {
+  id            Int        @id @default(autoincrement())
+  email         String     @unique
+  password      String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime?
+  deletedAt     DateTime?
+  notification  Boolean    @default(true)
+  firebaseToken String
+  roleTypeId    Int        @default(3)
+  Client        Client[]
+  Employee      Employee[]
+  Errors        Errors[]
+  RoleType      RoleType   @relation(fields: [roleTypeId], references: [id])
+}
+
+enum EspecificationTypes {
+  EMPRESA
+  PRODUTO
+  SERVICO
+}
+
+enum FormatStyles {
+  QUADRADA
+  REDONDA
+  RETANGULAR_HORIZONTAL
+  RETANGULAR_VERTICAL
+  NONE
+}
+
+enum LogoStatus {
+  BRIEFING
+  CRIACAO
+  PROVAS
+  AVALIACAO
+  CONCLUSAO
+}
+
+enum MediaFormat {
+  FEED
+  STORIES
+  REELS
+}
+
+enum NetworkTypes {
+  FACEBOOK
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+  LINKEDIN
+}
+
+enum PaymentStatus {
+  WAITING
+  FINISHED_PAYMENT
+  SENDED_TO_ASANA
+}
+
+enum SiteModels {
+  ONEPAGE
+  MULTIPAGE
+  LANDPAGE
+  MOBILEFIRST
+  NONE
+}
+
+enum SiteStatus {
+  BRIEFING
+  PLANEJAMENTO
+  DEFINICAO
+  AMOSTRA
+  APRESENTACAO
+  PUBLICACAO
+}
+
+enum SocialImageBase {
+  BANCO
+  CLIENTE
+  AMBAS
+}
+
+enum SocialMaterialQuant {
+  DIARIO
+  SEMANAL
+  MENSAL
+}
+
+enum SocialServiceTypes {
+  PLANEJAMENTO_GERAL
+  PLANEJAMENTO_REDACIONAL
+  PLANEJAMENTO_VISUAL
+  PLANEJAMENTO_POSTAGENS
+  PLANEJAMENTO_GESTAO
+}
+
+enum SocialStatus {
+  BRIEFING
+  PLANEJAMENTO
+  AMOSTRA
+  CRIACAO
+  APROVACAO
+}
