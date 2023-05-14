@@ -23,6 +23,7 @@ export class AuthenticationAdminMiddleware implements NestMiddleware {
       const jwtData = await this.jwt.readJwt({
         token: req.headers.authorization,
       });
+
       if (jwtData.roleType == 1) {
         req.userId = jwtData.userId;
         req.id = jwtData.id;
