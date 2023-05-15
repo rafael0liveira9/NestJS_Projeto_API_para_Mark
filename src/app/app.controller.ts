@@ -14,4 +14,9 @@ export class AppController {
   getOi() {
     return this.appService.sendHello();
   }
+
+  @Get('/users')
+  getUsers() {
+    return this.appService.getUserData();
+  }
 }

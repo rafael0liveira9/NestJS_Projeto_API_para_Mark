@@ -5,7 +5,7 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { JwtService } from 'src/singleServices/jwt.service';
+import { JwtService } from '../singleServices/jwt.service';
 
 interface RequestAuth extends Request {
   userId: number;
