@@ -8,6 +8,6 @@ import { AuthModule } from '../auth/auth.module';
 @Module({
   imports: [AuthModule],
   controllers: [AppController],
-  providers: [JwtService, PrismaService, AppService],
+  providers: [PrismaService, JwtService, AppService],
 })
 export class AppModule {}
