@@ -4,6 +4,11 @@ import { Client, Prisma } from '@prisma/client';
 
 import * as bcrypt from 'bcrypt';
 import { ClientJToken, ErrorReturn } from 'src/types/types';
+import {
+  CreateUserAdmin,
+  CreateUserClient,
+  UserDefault,
+} from './dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -12,59 +17,20 @@ export class AuthController {
   @Post('/signup')
   async signUpUser(
     @Body()
-    body: {
-      name: string;
-      document: string;
-      documentType: string;
-      phone: string;
-      email: string;
-      password: string;
-      firebaseToken: string;
-    },
+    createUserClient: CreateUserClient,
   ): Promise<ClientJToken | ErrorReturn> {
-    return this.authService.createUserClient(body);
-  }
-
-  @Post('/employee/signup')
-  async signUpEmployee(
-    @Body()
-    body: {
-      name: string;
-      document: string;
-      documentType: string;
-      phone: string;
-      email: string;
-      password: string;
-      firebaseToken?: string;
-      isAdmin: false;
-    },
-  ) {
-    return this.authService.createUserEmployee(body, false);
+    return this.authService.createUserClient(createUserClient);
   }
 
   @Post('/admin/signup')
-  async signUpAdmin(
-    @Body()
-    body: {
-      name: string;
-      document: string;
-      documentType: string;
-      phone: string;
-      email: string;
-      password: string;
-      firebaseToken?: string;
-    },
-  ) {
-    return this.authService.createUserEmployee(body, true);
+  async signUpAdmin(@Body() createUserAdmin: CreateUserAdmin) {
+    return this.authService.createUserEmployee(createUserAdmin);
   }
 
   @Post('/signin')
   async signIn(
     @Body()
-    body: {
-      email: string;
-      password: string;
-    },
+    body: UserDefault,
   ) {
     return this.authService.userLogin(body);
   }

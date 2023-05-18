@@ -5,6 +5,11 @@ import { ClientJToken, EmployeeJToken, ErrorReturn } from 'src/types/types';
 
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '../singleServices/jwt.service';
+import {
+  CreateUserAdmin,
+  CreateUserClient,
+  UserDefault,
+} from './dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -26,15 +31,9 @@ export class AuthService {
     });
   }
 
-  async createUserClient(params: {
-    name: string;
-    document: string;
-    documentType: string;
-    password: string;
-    phone: string;
-    email: string;
-    firebaseToken: string;
-  }): Promise<ClientJToken | ErrorReturn> {
+  async createUserClient(
+    params: CreateUserClient,
+  ): Promise<ClientJToken | ErrorReturn> {
     try {
       const userExist = await this.prisma.user.findFirst({
         where: {
@@ -87,16 +86,7 @@ export class AuthService {
   }
 
   async createUserEmployee(
-    params: {
-      name: string;
-      document: string;
-      documentType: string;
-      password: string;
-      phone: string;
-      email: string;
-      firebaseToken?: string;
-    },
-    isAdmin: boolean,
+    params: CreateUserAdmin,
   ): Promise<EmployeeJToken | ErrorReturn> {
     try {
       const userExist = await this.prisma.user.findFirst({
@@ -118,7 +108,7 @@ export class AuthService {
                 email: params.email,
                 password: await bcrypt.hash(params.password, 8),
                 firebaseToken: params.firebaseToken,
-                roleTypeId: !isAdmin ? 2 : 1,
+                roleTypeId: !params.isAdmin ? 2 : 1,
               },
             },
           },
@@ -144,7 +134,9 @@ export class AuthService {
         };
       } else {
         return {
-          Message: 'Funcionário já existe, tente outro email',
+          Message: params.isAdmin
+            ? 'Admin Já existe, tente outro email'
+            : 'Funcionário já existe, tente outro email',
           Code: 400,
         };
       }
@@ -152,7 +144,7 @@ export class AuthService {
       console.log(error);
       throw new HttpException(
         {
-          Code: HttpStatus.BAD_REQUEST,
+          Code: HttpStatus.FORBIDDEN,
           Message: error,
         },
         HttpStatus.FORBIDDEN,
@@ -160,10 +152,9 @@ export class AuthService {
     }
   }
 
-  async userLogin(params: {
-    email: string;
-    password: string;
-  }): Promise<EmployeeJToken | ClientJToken | ErrorReturn> {
+  async userLogin(
+    params: UserDefault,
+  ): Promise<EmployeeJToken | ClientJToken | ErrorReturn> {
     try {
       let userExist = await this.prisma.client.findFirst({
         where: {

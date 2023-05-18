@@ -18,7 +18,6 @@ export class AuthenticationAdminMiddleware implements NestMiddleware {
   constructor(private jwt: JwtService) {}
 
   async use(req: RequestAuth, res: Response, next: Function) {
-    console.log('Request...');
     try {
       const jwtData = await this.jwt.readJwt({
         token: req.headers.authorization,
@@ -39,10 +38,6 @@ export class AuthenticationAdminMiddleware implements NestMiddleware {
         );
       }
     } catch (error) {
-      console.log(
-        '🚀 ~ file: authenticationAdmin.middleware.ts:33 ~ AuthenticationAdminMiddleware ~ use ~ error:',
-        error,
-      );
       throw new HttpException(
         {
           Code: HttpStatus.UNAUTHORIZED,

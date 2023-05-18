@@ -43,11 +43,11 @@ model Client {
 model Companies {
   id               Int                @id @default(autoincrement())
   companyName      String
-  document         String
+  document         String             @unique
   documentType     String
   clientId         Int?
   createdAt        DateTime           @default(now())
-  updatedAt        DateTime
+  updatedAt        DateTime?
   Cards            Cards[]
   Client           Client?            @relation(fields: [clientId], references: [id])
   ContratedService ContratedService[]

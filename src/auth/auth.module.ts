@@ -18,9 +18,6 @@ export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthenticationAdminMiddleware)
-      .forRoutes(
-        { path: '/auth/admin/signup', method: RequestMethod.POST },
-        { path: '/auth/employee/signup', method: RequestMethod.POST },
-      );
+      .forRoutes({ path: '/auth/admin/signup', method: RequestMethod.POST });
   }
 }
