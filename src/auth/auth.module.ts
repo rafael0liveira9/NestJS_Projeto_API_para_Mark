@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { PrismaService } from 'src/singleServices/prisma.service';
-import { AuthenticationAdminMiddleware } from 'src/middlewares/authenticationAdmin.middleware';
-import { JwtService } from 'src/singleServices/jwt.service';
+import { PrismaService } from '../singleServices/prisma.service';
+import { AuthenticationAdminMiddleware } from '../middlewares/authenticationAdmin.middleware';
+import { JwtService } from '../singleServices/jwt.service';
 
 @Module({
   controllers: [AuthController],

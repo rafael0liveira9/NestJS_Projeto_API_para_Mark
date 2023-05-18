@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Client, Prisma, User } from '@prisma/client';
-import { PrismaService } from 'src/singleServices/prisma.service';
+import { PrismaService } from '../singleServices/prisma.service';
 import { ClientJToken, EmployeeJToken, ErrorReturn } from 'src/types/types';
 
 import * as bcrypt from 'bcrypt';
-import { JwtService } from 'src/singleServices/jwt.service';
+import { JwtService } from '../singleServices/jwt.service';
 
 @Injectable()
 export class AuthService {
