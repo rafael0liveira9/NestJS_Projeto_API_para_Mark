@@ -5,9 +5,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from '../auth/auth.module';
 import { CompanieModule } from 'src/companie/companie.module';
+import { LeadModule } from 'src/lead/lead.module';
 
 @Module({
-  imports: [AuthModule, CompanieModule],
+  imports: [AuthModule, CompanieModule, LeadModule],
   controllers: [AppController],
   providers: [PrismaService, JwtService, AppService],
 })

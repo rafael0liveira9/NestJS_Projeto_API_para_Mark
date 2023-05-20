@@ -64,15 +64,71 @@ export class CompanieService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} companie`;
+  async findOne(id: number) {
+    try {
+      return await this.prisma.companies.findUnique({
+        where: {
+          id: id,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          Code: HttpStatus.NOT_FOUND,
+          Message: error?.message ?? error,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
-  update(id: number, updateCompanieDto: UpdateCompanieDto) {
-    return `This action updates a #${id} companie`;
+  async update(id: number, updateCompanieDto: UpdateCompanieDto) {
+    try {
+      return await this.prisma.companies.update({
+        where: {
+          id: id,
+        },
+        data: {
+          document: updateCompanieDto.document,
+          documentType: updateCompanieDto.documentType,
+          companyName: updateCompanieDto.companyName,
+        },
+        include: {
+          ContratedService: {
+            include: {
+              LogoContratedItems: true,
+              SiteContratedItems: true,
+              SocialContratedItems: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          Code: HttpStatus.NOT_FOUND,
+          Message: error?.message ?? error,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} companie`;
+  async remove(id: number) {
+    try {
+      return await this.prisma.companies.delete({
+        where: {
+          id: id,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          Code: HttpStatus.NOT_FOUND,
+          Message: error?.message ?? error,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 }

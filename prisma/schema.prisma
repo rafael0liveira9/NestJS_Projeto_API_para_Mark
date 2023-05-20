@@ -92,7 +92,7 @@ model Lead {
   email       String    @unique
   phone       String
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime
+  updatedAt   DateTime?
   subscribeAt DateTime?
 }
 
