@@ -32,6 +32,8 @@ model Client {
   document     String
   documentType String
   phone        String
+  cep          String
+  costumerId   String
   createdAt    DateTime    @default(now())
   updatedAt    DateTime?
   userId       Int
@@ -105,7 +107,7 @@ model LogoBriefing {
   description    String?
   references     String?
   mockups        String?
-  LogoService    LogoService         @relation(fields: [id], references: [id])
+  LogoService    LogoService[]
 
   @@index([id])
 }
@@ -125,9 +127,10 @@ model LogoService {
   updatedAt          DateTime
   dueDate            DateTime?
   serviceTypeId      Int?                 @default(3)
-  LogoBriefing       LogoBriefing?
+  LogoBriefing       LogoBriefing?        @relation(fields: [logoBriefingId], references: [id])
   LogoContratedItems LogoContratedItems[]
   ServiceType        ServiceType?         @relation(fields: [serviceTypeId], references: [id])
+  logoBriefingId     Int?
 }
 
 model Packages {
@@ -155,11 +158,12 @@ model Payments {
   companiesId Int
   value       Float
   discount    Float?
+  //Alterar voucher id junto do schema/model junto ao banco
   voucherId   Int?
   status      PaymentStatus
   logGateway  Json
   createdAt   DateTime      @default(now())
-  updatedAt   DateTime
+  updatedAt   DateTime?
   Client      Client        @relation(fields: [clientId], references: [id])
   Companies   Companies     @relation(fields: [companiesId], references: [id])
 }
@@ -192,14 +196,14 @@ model ServiceType {
 }
 
 model SiteBriefing {
-  id          Int         @id
+  id          Int           @id
   siteModel   SiteModels
   url         String?
   references  Json?
   logo        String?
   contactData String?
   socialMidia String?
-  SiteService SiteService @relation(fields: [id], references: [id])
+  SiteService SiteService[]
 
   @@index([id])
 }
@@ -219,9 +223,10 @@ model SiteService {
   updatedAt          DateTime
   dueDate            DateTime?
   serviceTypeId      Int?                 @default(1)
-  SiteBriefing       SiteBriefing?
+  SiteBriefing       SiteBriefing?        @relation(fields: [siteBriefingId], references: [id])
   SiteContratedItems SiteContratedItems[]
   ServiceType        ServiceType?         @relation(fields: [serviceTypeId], references: [id])
+  siteBriefingId     Int?
 }
 
 model SocialBriefing {
@@ -232,7 +237,7 @@ model SocialBriefing {
   materialQuant SocialMaterialQuant
   daysHours     String
   mediaFormat   MediaFormat
-  SocialService SocialService       @relation(fields: [id], references: [id])
+  SocialService SocialService[]
 
   @@index([id])
 }
@@ -252,9 +257,10 @@ model SocialService {
   updatedAt            DateTime
   dueDate              DateTime?
   serviceTypeId        Int?                   @default(2)
-  SocialBriefing       SocialBriefing?
+  SocialBriefing       SocialBriefing?        @relation(fields: [socialBriefingId], references: [id])
   SocialContratedItems SocialContratedItems[]
   ServiceType          ServiceType?           @relation(fields: [serviceTypeId], references: [id])
+  socialBriefingId     Int?
 }
 
 model Tables {

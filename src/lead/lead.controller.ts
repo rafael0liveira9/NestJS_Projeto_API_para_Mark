@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Put,
@@ -34,6 +33,11 @@ export class LeadController {
   @Put(':id')
   update(@Param('id') id: string, @Body() updateLeadDto: UpdateLeadDto) {
     return this.leadService.update(+id, updateLeadDto);
+  }
+
+  @Post('subscribe')
+  subscribe(@Body() createLeadDto: CreateLeadDto) {
+    return this.leadService.subscribe(createLeadDto);
   }
 
   @Delete(':id')

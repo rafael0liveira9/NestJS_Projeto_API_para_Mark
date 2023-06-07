@@ -18,6 +18,8 @@ export class CreateUserClient extends UserDefault {
   phone: string;
   @ApiProperty()
   firebaseToken: string;
+  @ApiProperty()
+  cep: string;
 }
 
 export class CreateUserAdmin extends CreateUserClient {

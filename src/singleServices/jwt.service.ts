@@ -51,18 +51,3 @@ export class JwtService {
     return decodedData;
   }
 }
-
-/* 
-jwt.sign(
-            {
-              id: clientData.id,
-              userId: clientData.User.id,
-              roleType: clientData.User.roleTypeId,
-            },
-            process.env.SECRET,
-            {
-              expiresIn: 86400,
-            },
-          )
-
-*/

@@ -1,0 +1,20 @@
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { PaymentService } from './payment.service';
+import { PaymentController } from './payment.controller';
+import { JwtService } from 'src/singleServices/jwt.service';
+import { PrismaService } from 'src/singleServices/prisma.service';
+import { AsaasService } from 'src/singleServices/asaas.service';
+import { AuthenticationAdminMiddleware } from 'src/middlewares/authenticationAdmin.middleware';
+import { AutheticationUserMiddleware } from 'src/middlewares/authenticationUser.middleware';
+
+@Module({
+  controllers: [PaymentController],
+  providers: [PaymentService, JwtService, PrismaService, AsaasService],
+})
+export class PaymentModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AutheticationUserMiddleware)
+      .forRoutes({ path: '/payment/checkout', method: RequestMethod.POST });
+  }
+}

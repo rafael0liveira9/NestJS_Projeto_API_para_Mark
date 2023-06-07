@@ -103,6 +103,37 @@ export class LeadService {
     }
   }
 
+  async subscribe(createLeadDto: CreateLeadDto) {
+    if (
+      await this.prisma.lead.findUnique({
+        where: {
+          email: createLeadDto.email,
+        },
+      })
+    )
+      try {
+        return await this.prisma.lead.update({
+          where: {
+            email: createLeadDto.email,
+          },
+          data: {
+            subscribeAt: new Date(),
+          },
+        });
+      } catch (error) {
+        throw new HttpException(
+          {
+            Code: HttpStatus.BAD_REQUEST,
+            Message: 'Ocorreu um erro ao atualizar lead.',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    else {
+      return;
+    }
+  }
+
   async remove(id: number) {
     try {
       return await this.prisma.lead.delete({

@@ -6,9 +6,19 @@ import { AppService } from './app.service';
 import { AuthModule } from '../auth/auth.module';
 import { CompanieModule } from 'src/companie/companie.module';
 import { LeadModule } from 'src/lead/lead.module';
+import { ServiceModule } from 'src/service/service.module';
+import { BriefingModule } from 'src/briefing/briefing.module';
+import { PaymentModule } from 'src/payment/payment.module';
 
 @Module({
-  imports: [AuthModule, CompanieModule, LeadModule],
+  imports: [
+    AuthModule,
+    CompanieModule,
+    LeadModule,
+    ServiceModule,
+    BriefingModule,
+    PaymentModule,
+  ],
   controllers: [AppController],
   providers: [PrismaService, JwtService, AppService],
 })

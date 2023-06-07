@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Client, Prisma, User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { PrismaService } from '../singleServices/prisma.service';
 import { ClientJToken, EmployeeJToken, ErrorReturn } from 'src/types/types';
 
@@ -10,10 +10,17 @@ import {
   CreateUserClient,
   UserDefault,
 } from './dto/create-user.dto';
+import { LeadService } from 'src/lead/lead.service';
+import { AsaasService } from 'src/singleServices/asaas.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwt: JwtService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwt: JwtService,
+    private leadService: LeadService,
+    private asaas: AsaasService,
+  ) {}
 
   async getUsers(params: {
     skip?: number;
@@ -42,12 +49,26 @@ export class AuthService {
       });
 
       if (!userExist) {
+        const userLead = this.leadService.subscribe({
+          email: params.email,
+          phone: '',
+          name: '',
+        });
+
+        const costumerData = await this.asaas.createCostumer({
+          email: params.email,
+          phone: params.phone,
+          name: params.name,
+        });
+
         const clientData = await this.prisma.client.create({
           data: {
             name: params.name,
             document: params.document,
             documentType: params.documentType,
             phone: params.phone,
+            costumerId: costumerData.id,
+            cep: params.cep,
             User: {
               create: {
                 email: params.email,
@@ -81,6 +102,7 @@ export class AuthService {
         return { Message: 'Usuário já existe, tente outro email', Code: 400 };
       }
     } catch (error) {
+      console.log(error);
       return { Message: error.toString(), Code: 500 };
     }
   }
