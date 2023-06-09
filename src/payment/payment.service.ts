@@ -358,6 +358,10 @@ export class PaymentService {
     }
   }
 
+  async testWebhook(req) {
+    console.log(req);
+  }
+
   private async calculateValue(
     createPaymentDto: CreatePaymentDto,
   ): Promise<number> {

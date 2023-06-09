@@ -22,8 +22,8 @@ export class PaymentController {
   }
 
   @Post('checkout/webhook')
-  confirmWebhook(@Body() createPaymentDto: CreatePaymentDto, @Req() req) {
-    return this.paymentService.finishCheckoutWebhook(createPaymentDto, req);
+  confirmWebhook(@Body() body) {
+    return this.paymentService.testWebhook(body);
   }
 
   @Get()
