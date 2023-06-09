@@ -3,6 +3,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtService } from '../singleServices/jwt.service';
 import { PrismaService } from '../singleServices/prisma.service';
+import { AsaasService } from 'src/singleServices/asaas.service';
+import { LeadService } from 'src/lead/lead.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -10,7 +12,13 @@ describe('AuthController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [AuthService, JwtService, PrismaService],
+      providers: [
+        AuthService,
+        JwtService,
+        PrismaService,
+        AsaasService,
+        LeadService,
+      ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
