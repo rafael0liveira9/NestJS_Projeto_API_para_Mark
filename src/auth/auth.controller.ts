@@ -1,6 +1,5 @@
 import { Controller, Post, Req, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Client, Prisma } from '@prisma/client';
 
 import * as bcrypt from 'bcrypt';
 import { ClientJToken, ErrorReturn } from 'src/types/types';
