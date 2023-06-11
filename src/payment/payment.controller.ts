@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Req,
+  HttpCode,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -22,6 +23,7 @@ export class PaymentController {
   }
 
   @Post('checkout/webhook')
+  @HttpCode(200)
   confirmWebhook(@Body() body) {
     return this.paymentService.testWebhook(body);
   }
