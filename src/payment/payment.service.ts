@@ -373,15 +373,21 @@ export class PaymentService {
     }
   }
 
-  async testWebhook(req) {
+  async webhookPayment(req) {
     try {
-      const data = await this.prisma.payments.findUnique({
-        where: {
-          uuid: req.payment.externalReference,
-        },
-      });
+      if (req.payment.status == 'RECEIVED') {
+        await this.prisma.payments.update({
+          where: {
+            uuid: req.payment.externalReference,
+          },
+          data: {
+            status: 'FINISHED_PAYMENT',
+          },
+        });
 
-      console.log(data);
+        this.sendToAsana();
+      }
+
       return '';
     } catch (error) {
       return '';
@@ -484,6 +490,10 @@ export class PaymentService {
         updatedAt: new Date(),
       },
     });
+  }
+
+  private async sendToAsana() {
+    return;
   }
 
   findAll() {

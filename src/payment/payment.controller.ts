@@ -25,7 +25,7 @@ export class PaymentController {
   @Post('checkout/webhook')
   @HttpCode(200)
   confirmWebhook(@Body() body) {
-    return this.paymentService.testWebhook(body);
+    return this.paymentService.webhookPayment(body);
   }
 
   @Get()
