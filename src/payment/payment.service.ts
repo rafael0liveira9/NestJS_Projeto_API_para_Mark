@@ -372,13 +372,17 @@ export class PaymentService {
   }
 
   async testWebhook(req) {
-    const data = await this.prisma.payments.findUnique({
-      where: {
-        uuid: req.payment.externalReference,
-      },
-    });
+    try {
+      const data = await this.prisma.payments.findUnique({
+        where: {
+          uuid: req.payment.externalReference,
+        },
+      });
 
-    console.log(data);
+      console.log(data);
+    } catch (error) {
+      return '';
+    }
   }
 
   private async calculateValue(
