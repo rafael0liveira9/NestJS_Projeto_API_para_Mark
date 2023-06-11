@@ -27,19 +27,20 @@ model Cards {
 }
 
 model Client {
-  id           Int         @id @default(autoincrement())
-  name         String
-  document     String
-  documentType String
-  phone        String
-  cep          String
-  costumerId   String
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime?
-  userId       Int
-  User         User        @relation(fields: [userId], references: [id])
-  Companies    Companies[]
-  Payments     Payments[]
+  id               Int                @id @default(autoincrement())
+  name             String
+  document         String
+  documentType     String
+  phone            String
+  cep              String
+  costumerId       String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime?
+  userId           Int
+  User             User               @relation(fields: [userId], references: [id])
+  Companies        Companies[]
+  Payments         Payments[]
+  PaymentsServices PaymentsServices[]
 }
 
 model Companies {
@@ -54,6 +55,7 @@ model Companies {
   Client           Client?            @relation(fields: [clientId], references: [id])
   ContratedService ContratedService[]
   Payments         Payments[]
+  PaymentsServices PaymentsServices[]
 }
 
 model ContratedService {
@@ -142,6 +144,7 @@ model Packages {
   updatedAt        DateTime?
   dueDate          DateTime?
   PackagesServices PackagesServices[]
+  PaymentsServices PaymentsServices[]
 }
 
 model PackagesServices {
@@ -153,20 +156,36 @@ model PackagesServices {
 }
 
 model Payments {
-  id          Int           @id @default(autoincrement())
-  uuid        String        @unique
+  id               Int                @id @default(autoincrement())
+  uuid             String             @unique
+  clientId         Int
+  companiesId      Int
+  value            Float
+  discount         Float?
+  //Alterar voucher id junto do schema/model junto ao banco
+  voucherId        Int?
+  status           PaymentStatus
+  logGateway       Json
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime?
+  Client           Client             @relation(fields: [clientId], references: [id])
+  Companies        Companies          @relation(fields: [companiesId], references: [id])
+  PaymentsServices PaymentsServices[]
+}
+
+model PaymentsServices {
+  id          Int       @id @default(autoincrement())
+  paymentsId  Int
+  serviceId   Int?
   clientId    Int
   companiesId Int
-  value       Float
-  discount    Float?
-  //Alterar voucher id junto do schema/model junto ao banco
-  voucherId   Int?
-  status      PaymentStatus
-  logGateway  Json
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime?
-  Client      Client        @relation(fields: [clientId], references: [id])
-  Companies   Companies     @relation(fields: [companiesId], references: [id])
+  packagesId  Int?
+  createdAt   DateTime  @default(now())
+  Client      Client    @relation(fields: [clientId], references: [id])
+  Payment     Payments  @relation(fields: [paymentsId], references: [id])
+  Service     Service?  @relation(fields: [serviceId], references: [id])
+  Companies   Companies @relation(fields: [companiesId], references: [id])
+  Package     Packages? @relation(fields: [packagesId], references: [id])
 }
 
 model RoleType {
@@ -185,6 +204,7 @@ model Service {
   serviceTypeId    Int
   PackagesServices PackagesServices[]
   ServiceType      ServiceType        @relation(fields: [serviceTypeId], references: [id])
+  PaymentsServices PaymentsServices[]
 }
 
 model ServiceType {

@@ -34,12 +34,7 @@ export class PaymentService {
     });
 
     if (clientData.Companies.length > 0) {
-      /* 
-      !Criar função de criação do UUID e enviar para o banco de dados
-      */
       const uuidPayment = uuidv4();
-
-      console.log('---->', uuidPayment);
 
       try {
         const payment = await this.asaas.createPaymentCreditCard({
@@ -65,22 +60,12 @@ export class PaymentService {
           },
         });
 
-        /* 
-        !Adicionar UUID ao retorno para o DB
-        !Adicionar UUID a coluna do banco de dados.
-        */
-
-        await this.sendPaymentData(
+        return await this.sendPaymentData(
           createPaymentDto,
           clientData,
           valueTotal,
           await payment.json(),
           uuidPayment,
-        );
-
-        return await this.finishCheckoutWebhook(
-          createPaymentDto,
-          clientData.Companies[0].id,
         );
       } catch (error) {
         console.log(error);
@@ -97,201 +82,49 @@ export class PaymentService {
     }
   }
 
-  async finishCheckoutWebhook(
-    createPaymentDto: CreatePaymentDto,
-    companieId: number,
-  ) {
+  async finishCheckout(uuid: string) {
     let socialServices = [],
       logoServices = [],
       siteServices = [];
 
-    if (createPaymentDto.package == null && createPaymentDto.service != null) {
-      if (typeof createPaymentDto.service == 'number') {
-        const serviceData = await this.prisma.service.findUnique({
-          where: {
-            id: createPaymentDto.service,
-          },
-        });
-
-        if (serviceData.serviceTypeId == 1) {
-          const contratedService = await this.prisma.contratedService.upsert({
-            where: {
-              id: createPaymentDto.contratedServiceId,
-            },
-            create: {
-              companiesId: companieId,
-              SiteContratedItems: {
-                create: {
-                  SiteService: {
-                    create: {
-                      serviceTypeId: 1,
-                      status: 'BRIEFING',
-                      updatedAt: new Date(),
-                    },
-                  },
-                },
-              },
-            },
-            update: {
-              companiesId: companieId,
-              SiteContratedItems: {
-                create: {
-                  SiteService: {
-                    create: {
-                      serviceTypeId: 1,
-                      status: 'BRIEFING',
-                      updatedAt: new Date(),
-                    },
-                  },
-                },
-              },
-            },
-            include: {
-              SocialContratedItems: true,
-              LogoContratedItems: true,
-              SiteContratedItems: true,
-            },
-          });
-
-          return contratedService;
-        } else if (serviceData.serviceTypeId == 2) {
-          const contratedService = await this.prisma.contratedService.upsert({
-            where: {
-              id: createPaymentDto.contratedServiceId,
-            },
-            create: {
-              companiesId: companieId,
-              LogoContratedItems: {
-                create: {
-                  LogoService: {
-                    create: {
-                      serviceTypeId: 2,
-                      status: 'BRIEFING',
-                      updatedAt: new Date(),
-                    },
-                  },
-                },
-              },
-            },
-            update: {
-              companiesId: companieId,
-              LogoContratedItems: {
-                create: {
-                  LogoService: {
-                    create: {
-                      serviceTypeId: 2,
-                      status: 'BRIEFING',
-                      updatedAt: new Date(),
-                    },
-                  },
-                },
-              },
-            },
-            include: {
-              SocialContratedItems: true,
-              LogoContratedItems: true,
-              SiteContratedItems: true,
-            },
-          });
-
-          return contratedService;
-        } else if (serviceData.serviceTypeId == 3) {
-          const contratedService = await this.prisma.contratedService.upsert({
-            where: {
-              id: createPaymentDto.contratedServiceId,
-            },
-            create: {
-              companiesId: companieId,
-              SocialContratedItems: {
-                create: {
-                  SocialService: {
-                    create: {
-                      serviceTypeId: 3,
-                      status: 'BRIEFING',
-                      updatedAt: new Date(),
-                    },
-                  },
-                },
-              },
-            },
-            update: {
-              companiesId: companieId,
-              SocialContratedItems: {
-                create: {
-                  SocialService: {
-                    create: {
-                      serviceTypeId: 3,
-                      status: 'BRIEFING',
-                      updatedAt: new Date(),
-                    },
-                  },
-                },
-              },
-            },
-            include: {
-              SocialContratedItems: true,
-              LogoContratedItems: true,
-              SiteContratedItems: true,
-            },
-          });
-
-          return contratedService;
-        }
-      } else {
-        throw new HttpException(
-          {
-            Code: HttpStatus.BAD_REQUEST,
-            Message: 'Ocorreu um erro na criação do serviço',
-          },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    } else if (
-      createPaymentDto.package != null &&
-      createPaymentDto.service == null
-    ) {
-      const packageData = await this.prisma.packages.findFirst({
-        where: {
-          id: createPaymentDto.package,
-        },
-        include: {
-          PackagesServices: {
-            include: {
-              Service: true,
-            },
+    const paymentData = await this.prisma.payments.findUnique({
+      where: {
+        uuid: uuid,
+      },
+      include: {
+        PaymentsServices: true,
+        Client: {
+          include: {
+            Companies: true,
           },
         },
-      });
+      },
+    });
 
-      packageData.PackagesServices.forEach((x) => {
-        if (x.Service.serviceTypeId == 1) {
-          siteServices.push(x.Service.id);
-        }
-        if (x.Service.serviceTypeId == 2) {
-          socialServices.push(x.Service.id);
-        }
-        if (x.Service.serviceTypeId == 3) {
-          logoServices.push(x.Service.id);
-        }
-      });
+    const userContratedService = await this.prisma.contratedService.findFirst({
+      where: {
+        companiesId: paymentData.companiesId,
+      },
+    });
 
-      const contratedServices = await this.prisma.contratedService.create({
-        data: {
-          companiesId: companieId,
-          SiteContratedItems: {
-            create: !!siteServices
-              ? siteServices.map(
-                  (
-                    x,
-                  ): {
-                    SiteService: {
-                      create: {
-                        serviceTypeId: number;
-                        status: 'BRIEFING';
-                        updatedAt: any;
-                      };
-                    };
-                  } => ({
+    if (paymentData) {
+      paymentData.PaymentsServices.map(async (x) => {
+        if (x.serviceId != null) {
+          const serviceData = await this.prisma.service.findUnique({
+            where: {
+              id: x.serviceId,
+            },
+          });
+
+          if (serviceData.serviceTypeId == 1) {
+            const contratedService = await this.prisma.contratedService.upsert({
+              where: {
+                id: userContratedService.id,
+              },
+              create: {
+                companiesId: x.companiesId,
+                SiteContratedItems: {
+                  create: {
                     SiteService: {
                       create: {
                         serviceTypeId: 1,
@@ -299,49 +132,40 @@ export class PaymentService {
                         updatedAt: new Date(),
                       },
                     },
-                  }),
-                )
-              : [],
-          },
-          SocialContratedItems: {
-            create: !!socialServices
-              ? socialServices.map(
-                  (
-                    x,
-                  ): {
-                    SocialService: {
+                  },
+                },
+              },
+              update: {
+                companiesId: x.companiesId,
+                SiteContratedItems: {
+                  create: {
+                    SiteService: {
                       create: {
-                        serviceTypeId: number;
-                        status: 'BRIEFING';
-                        updatedAt: any;
-                      };
-                    };
-                  } => ({
-                    SocialService: {
-                      create: {
-                        serviceTypeId: 3,
+                        serviceTypeId: 1,
                         status: 'BRIEFING',
                         updatedAt: new Date(),
                       },
                     },
-                  }),
-                )
-              : [],
-          },
-          LogoContratedItems: {
-            create: !!logoServices
-              ? logoServices.map(
-                  (
-                    x,
-                  ): {
-                    LogoService: {
-                      create: {
-                        serviceTypeId: number;
-                        status: 'BRIEFING';
-                        updatedAt: any;
-                      };
-                    };
-                  } => ({
+                  },
+                },
+              },
+              include: {
+                SocialContratedItems: true,
+                LogoContratedItems: true,
+                SiteContratedItems: true,
+              },
+            });
+
+            return contratedService;
+          } else if (serviceData.serviceTypeId == 2) {
+            const contratedService = await this.prisma.contratedService.upsert({
+              where: {
+                id: userContratedService.id,
+              },
+              create: {
+                companiesId: x.companiesId,
+                LogoContratedItems: {
+                  create: {
                     LogoService: {
                       create: {
                         serviceTypeId: 2,
@@ -349,19 +173,277 @@ export class PaymentService {
                         updatedAt: new Date(),
                       },
                     },
-                  }),
-                )
-              : [],
-          },
-        },
-        include: {
-          SocialContratedItems: true,
-          LogoContratedItems: true,
-          SiteContratedItems: true,
-        },
-      });
+                  },
+                },
+              },
+              update: {
+                companiesId: x.companiesId,
+                LogoContratedItems: {
+                  create: {
+                    LogoService: {
+                      create: {
+                        serviceTypeId: 2,
+                        status: 'BRIEFING',
+                        updatedAt: new Date(),
+                      },
+                    },
+                  },
+                },
+              },
+              include: {
+                SocialContratedItems: true,
+                LogoContratedItems: true,
+                SiteContratedItems: true,
+              },
+            });
 
-      return contratedServices;
+            return contratedService;
+          } else if (serviceData.serviceTypeId == 3) {
+            const contratedService = await this.prisma.contratedService.upsert({
+              where: {
+                id: userContratedService.id,
+              },
+              create: {
+                companiesId: x.companiesId,
+                SocialContratedItems: {
+                  create: {
+                    SocialService: {
+                      create: {
+                        serviceTypeId: 3,
+                        status: 'BRIEFING',
+                        updatedAt: new Date(),
+                      },
+                    },
+                  },
+                },
+              },
+              update: {
+                companiesId: x.companiesId,
+                SocialContratedItems: {
+                  create: {
+                    SocialService: {
+                      create: {
+                        serviceTypeId: 3,
+                        status: 'BRIEFING',
+                        updatedAt: new Date(),
+                      },
+                    },
+                  },
+                },
+              },
+              include: {
+                SocialContratedItems: true,
+                LogoContratedItems: true,
+                SiteContratedItems: true,
+              },
+            });
+
+            return contratedService;
+          }
+        } else if (x.packagesId != null) {
+          const packageData = await this.prisma.packages.findFirst({
+            where: {
+              id: x.packagesId,
+            },
+            include: {
+              PackagesServices: {
+                include: {
+                  Service: true,
+                },
+              },
+            },
+          });
+
+          packageData.PackagesServices.forEach((x) => {
+            if (x.Service.serviceTypeId == 1) {
+              siteServices.push(x.Service.id);
+            }
+            if (x.Service.serviceTypeId == 2) {
+              socialServices.push(x.Service.id);
+            }
+            if (x.Service.serviceTypeId == 3) {
+              logoServices.push(x.Service.id);
+            }
+          });
+
+          const contratedServices = await this.prisma.contratedService.upsert({
+            where: {
+              id: userContratedService.id,
+            },
+            create: {
+              companiesId: userContratedService.companiesId,
+              SiteContratedItems: {
+                create: !!siteServices
+                  ? siteServices.map(
+                      (
+                        x,
+                      ): {
+                        SiteService: {
+                          create: {
+                            serviceTypeId: number;
+                            status: 'BRIEFING';
+                            updatedAt: any;
+                          };
+                        };
+                      } => ({
+                        SiteService: {
+                          create: {
+                            serviceTypeId: 1,
+                            status: 'BRIEFING',
+                            updatedAt: new Date(),
+                          },
+                        },
+                      }),
+                    )
+                  : [],
+              },
+              SocialContratedItems: {
+                create: !!socialServices
+                  ? socialServices.map(
+                      (
+                        x,
+                      ): {
+                        SocialService: {
+                          create: {
+                            serviceTypeId: number;
+                            status: 'BRIEFING';
+                            updatedAt: any;
+                          };
+                        };
+                      } => ({
+                        SocialService: {
+                          create: {
+                            serviceTypeId: 3,
+                            status: 'BRIEFING',
+                            updatedAt: new Date(),
+                          },
+                        },
+                      }),
+                    )
+                  : [],
+              },
+              LogoContratedItems: {
+                create: !!logoServices
+                  ? logoServices.map(
+                      (
+                        x,
+                      ): {
+                        LogoService: {
+                          create: {
+                            serviceTypeId: number;
+                            status: 'BRIEFING';
+                            updatedAt: any;
+                          };
+                        };
+                      } => ({
+                        LogoService: {
+                          create: {
+                            serviceTypeId: 2,
+                            status: 'BRIEFING',
+                            updatedAt: new Date(),
+                          },
+                        },
+                      }),
+                    )
+                  : [],
+              },
+            },
+            update: {
+              companiesId: userContratedService.companiesId,
+              SiteContratedItems: {
+                create: !!siteServices
+                  ? siteServices.map(
+                      (
+                        x,
+                      ): {
+                        SiteService: {
+                          create: {
+                            serviceTypeId: number;
+                            status: 'BRIEFING';
+                            updatedAt: any;
+                          };
+                        };
+                      } => ({
+                        SiteService: {
+                          create: {
+                            serviceTypeId: 1,
+                            status: 'BRIEFING',
+                            updatedAt: new Date(),
+                          },
+                        },
+                      }),
+                    )
+                  : [],
+              },
+              SocialContratedItems: {
+                create: !!socialServices
+                  ? socialServices.map(
+                      (
+                        x,
+                      ): {
+                        SocialService: {
+                          create: {
+                            serviceTypeId: number;
+                            status: 'BRIEFING';
+                            updatedAt: any;
+                          };
+                        };
+                      } => ({
+                        SocialService: {
+                          create: {
+                            serviceTypeId: 3,
+                            status: 'BRIEFING',
+                            updatedAt: new Date(),
+                          },
+                        },
+                      }),
+                    )
+                  : [],
+              },
+              LogoContratedItems: {
+                create: !!logoServices
+                  ? logoServices.map(
+                      (
+                        x,
+                      ): {
+                        LogoService: {
+                          create: {
+                            serviceTypeId: number;
+                            status: 'BRIEFING';
+                            updatedAt: any;
+                          };
+                        };
+                      } => ({
+                        LogoService: {
+                          create: {
+                            serviceTypeId: 2,
+                            status: 'BRIEFING',
+                            updatedAt: new Date(),
+                          },
+                        },
+                      }),
+                    )
+                  : [],
+              },
+            },
+            include: {
+              SocialContratedItems: true,
+              LogoContratedItems: true,
+              SiteContratedItems: true,
+            },
+          });
+
+          return contratedServices;
+        } else {
+          throw new HttpException(
+            {
+              Code: HttpStatus.BAD_REQUEST,
+              Message: 'Ocorreu um erro na criação do serviço',
+            },
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      });
     } else {
       throw new HttpException(
         {
@@ -385,7 +467,9 @@ export class PaymentService {
           },
         });
 
-        this.sendToAsana();
+        await this.finishCheckout(req.payment.externalReference);
+
+        await this.sendToAsana();
       }
 
       return '';
@@ -488,6 +572,25 @@ export class PaymentService {
         status: 'WAITING',
         logGateway: JSON.stringify(paymentData),
         updatedAt: new Date(),
+        PaymentsServices: {
+          create: createPaymentDto.service
+            ? typeof createPaymentDto.service == 'number'
+              ? {
+                  clientId: clientData.id,
+                  companiesId: clientData.Companies[0].id,
+                  serviceId: createPaymentDto.service,
+                }
+              : createPaymentDto.service.map((x) => ({
+                  clientId: clientData.id,
+                  companiesId: clientData.Companies[0].id,
+                  serviceId: x,
+                }))
+            : {
+                clientId: clientData.id,
+                companiesId: clientData.Companies[0].id,
+                serviceId: createPaymentDto.package,
+              },
+        },
       },
     });
   }
