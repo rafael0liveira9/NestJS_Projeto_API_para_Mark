@@ -457,7 +457,7 @@ export class PaymentService {
 
   async webhookPayment(req: any) {
     try {
-      if (req.payment.status == 'CONFIRMED') {
+      if (req.payment.status == 'RECEIVED') {
         await this.prisma.payments.update({
           where: {
             uuid: req.payment.externalReference,
