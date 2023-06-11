@@ -19,7 +19,7 @@ model Cards {
   clientId    Int
   dueDate     DateTime
   createdAt   DateTime   @default(now())
-  updatedAt   DateTime
+  updatedAt   DateTime?
   companiesId Int?
   Companies   Companies? @relation(fields: [companiesId], references: [id])
   Tables      Tables     @relation(fields: [typeCard], references: [id], onDelete: Cascade)
@@ -79,13 +79,13 @@ model Employee {
 }
 
 model Errors {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   errorCode Int
   message   String
   userId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-  User      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  User      User      @relation(fields: [userId], references: [id])
 }
 
 model Lead {
@@ -124,7 +124,7 @@ model LogoService {
   id                 Int                  @id @default(autoincrement())
   status             LogoStatus
   createdAt          DateTime             @default(now())
-  updatedAt          DateTime
+  updatedAt          DateTime?
   dueDate            DateTime?
   serviceTypeId      Int?                 @default(3)
   LogoBriefing       LogoBriefing?        @relation(fields: [logoBriefingId], references: [id])
@@ -139,7 +139,7 @@ model Packages {
   price            Float
   description      String
   createdAt        DateTime           @default(now())
-  updatedAt        DateTime
+  updatedAt        DateTime?
   dueDate          DateTime?
   PackagesServices PackagesServices[]
 }
@@ -154,6 +154,7 @@ model PackagesServices {
 
 model Payments {
   id          Int           @id @default(autoincrement())
+  uuid        String        @unique
   clientId    Int
   companiesId Int
   value       Float
@@ -180,7 +181,7 @@ model Service {
   price            Float
   description      String
   createdAt        DateTime           @default(now())
-  updatedAt        DateTime
+  updatedAt        DateTime?
   serviceTypeId    Int
   PackagesServices PackagesServices[]
   ServiceType      ServiceType        @relation(fields: [serviceTypeId], references: [id])
@@ -220,7 +221,7 @@ model SiteService {
   id                 Int                  @id @default(autoincrement())
   status             SiteStatus
   createdAt          DateTime             @default(now())
-  updatedAt          DateTime
+  updatedAt          DateTime?
   dueDate            DateTime?
   serviceTypeId      Int?                 @default(1)
   SiteBriefing       SiteBriefing?        @relation(fields: [siteBriefingId], references: [id])
@@ -254,7 +255,7 @@ model SocialService {
   id                   Int                    @id @default(autoincrement())
   status               SocialStatus
   createdAt            DateTime               @default(now())
-  updatedAt            DateTime
+  updatedAt            DateTime?
   dueDate              DateTime?
   serviceTypeId        Int?                   @default(2)
   SocialBriefing       SocialBriefing?        @relation(fields: [socialBriefingId], references: [id])
@@ -264,10 +265,10 @@ model SocialService {
 }
 
 model Tables {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   tabName   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
   Cards     Cards[]
 }
 

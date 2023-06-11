@@ -5,6 +5,8 @@ import { PrismaService } from 'src/singleServices/prisma.service';
 import { AsaasService } from 'src/singleServices/asaas.service';
 import { Client, Companies, User } from '@prisma/client';
 
+import { v4 as uuidv4 } from 'uuid';
+
 @Injectable()
 export class PaymentService {
   constructor(private prisma: PrismaService, private asaas: AsaasService) {}
@@ -32,13 +34,18 @@ export class PaymentService {
     });
 
     if (clientData.Companies.length > 0) {
+      /* 
+      !Criar função de criação do UUID e enviar para o banco de dados
+      */
+      const uuidPayment = uuidv4();
+
       try {
         const payment = await this.asaas.createPaymentCreditCard({
           costumer: clientData.costumerId,
           dueDate: '2023-10-05',
           value: valueTotal,
           description: 'Produto comprado',
-          externalReference: `${clientData.Companies[0].id}`,
+          externalReference: `${uuidPayment}`,
           creditCard: {
             holderName: createPaymentDto.paymentMethod.creditCard.holderName,
             number: createPaymentDto.paymentMethod.creditCard.number,
@@ -56,11 +63,17 @@ export class PaymentService {
           },
         });
 
+        /* 
+        !Adicionar UUID ao retorno para o DB
+        !Adicionar UUID a coluna do banco de dados.
+        */
+
         await this.sendPaymentData(
           createPaymentDto,
           clientData,
           valueTotal,
           await payment.json(),
+          uuidPayment,
         );
 
         return await this.finishCheckoutWebhook(
@@ -359,7 +372,13 @@ export class PaymentService {
   }
 
   async testWebhook(req) {
-    console.log('--------------> Webhook', req);
+    const data = await this.prisma.payments.findUnique({
+      where: {
+        uuid: req.payment.externalReference,
+      },
+    });
+
+    console.log(data);
   }
 
   private async calculateValue(
@@ -441,17 +460,19 @@ export class PaymentService {
     },
     totalVal: number,
     paymentData: any,
+    uuid: string,
     discount?: number,
     voucherId?: number,
   ) {
     return await this.prisma.payments.create({
       data: {
+        uuid,
         clientId: clientData.id,
         companiesId: clientData.Companies[0].id,
         value: totalVal,
         discount: discount,
         voucherId,
-        status: 'FINISHED_PAYMENT',
+        status: 'WAITING',
         logGateway: JSON.stringify(paymentData),
         updatedAt: new Date(),
       },
