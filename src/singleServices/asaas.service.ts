@@ -63,7 +63,7 @@ export class AsaasService {
       phoneNumber: string;
     };
   }): Promise<Response> {
-    console.log(userInfo);
+    console.log(externalReference, userInfo);
     try {
       const data = await fetch(`${process.env.ASAAS_URL}/api/v3/payments`, {
         method: 'POST',

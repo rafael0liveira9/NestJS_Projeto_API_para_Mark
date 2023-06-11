@@ -39,6 +39,8 @@ export class PaymentService {
       */
       const uuidPayment = uuidv4();
 
+      console.log('---->', uuidPayment);
+
       try {
         const payment = await this.asaas.createPaymentCreditCard({
           costumer: clientData.costumerId,
