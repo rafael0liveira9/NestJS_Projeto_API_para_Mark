@@ -382,6 +382,7 @@ export class PaymentService {
       });
 
       console.log(data);
+      return '';
     } catch (error) {
       return '';
     }
