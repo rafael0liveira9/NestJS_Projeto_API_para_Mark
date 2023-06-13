@@ -9,6 +9,7 @@ import { LeadModule } from 'src/lead/lead.module';
 import { ServiceModule } from 'src/service/service.module';
 import { BriefingModule } from 'src/briefing/briefing.module';
 import { PaymentModule } from 'src/payment/payment.module';
+import { ContratedServicesModule } from 'src/contrated-services/contrated-services.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PaymentModule } from 'src/payment/payment.module';
     ServiceModule,
     BriefingModule,
     PaymentModule,
+    ContratedServicesModule,
   ],
   controllers: [AppController],
   providers: [PrismaService, JwtService, AppService],

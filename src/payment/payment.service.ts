@@ -11,8 +11,6 @@ import { v4 as uuidv4 } from 'uuid';
 export class PaymentService {
   constructor(private prisma: PrismaService, private asaas: AsaasService) {}
 
-  //! Fluxo inteiro criado com intuíto de teste, necessário mudar para funcionar junto do Webhook
-
   async checkout(createPaymentDto: CreatePaymentDto, @Req() req) {
     let valueTotal = await this.calculateValue(createPaymentDto);
     return this.checkoutPayment(createPaymentDto, req, valueTotal);
@@ -82,7 +80,7 @@ export class PaymentService {
     }
   }
 
-  async finishCheckout(uuid: string) {
+  private async finishCheckout(uuid: string) {
     let socialServices = [],
       logoServices = [],
       siteServices = [];

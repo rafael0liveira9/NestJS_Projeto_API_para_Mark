@@ -8,7 +8,11 @@ import {
   Delete,
 } from '@nestjs/common';
 import { BriefingService } from './briefing.service';
-import { CreateBriefingDto } from './dto/create-briefing.dto';
+import {
+  CreateBriefingLogoDto,
+  CreateBriefingSocialDto,
+  CreateBriefingSiteDto,
+} from './dto/create-briefing.dto';
 import { UpdateBriefingDto } from './dto/update-briefing.dto';
 
 @Controller('briefing')
@@ -16,18 +20,18 @@ export class BriefingController {
   constructor(private readonly briefingService: BriefingService) {}
 
   @Post('social')
-  createBriefingSocial(@Body() createBriefingDto: CreateBriefingDto) {
-    return this.briefingService.create(createBriefingDto);
+  createBriefingSocial(@Body() createBriefingDto: CreateBriefingSocialDto) {
+    return this.briefingService.createSocial(createBriefingDto);
   }
 
   @Post('logo')
-  createBriefingLogo(@Body() createBriefingDto: CreateBriefingDto) {
-    return this.briefingService.create(createBriefingDto);
+  createBriefingLogo(@Body() createBriefingDto: CreateBriefingLogoDto) {
+    return this.briefingService.createLogo(createBriefingDto);
   }
 
   @Post('site')
-  createBriefingSite(@Body() createBriefingDto: CreateBriefingDto) {
-    return this.briefingService.create(createBriefingDto);
+  createBriefingSite(@Body() createBriefingDto: CreateBriefingSiteDto) {
+    return this.briefingService.createSite(createBriefingDto);
   }
 
   @Get()
