@@ -22,22 +22,6 @@ export class AuthService {
     private asaas: AsaasService,
   ) {}
 
-  async getUsers(params: {
-    skip?: number;
-    take?: number;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<User[]> {
-    const { skip, take, where, orderBy } = params;
-
-    return this.prisma.user.findMany({
-      skip,
-      take,
-      where,
-      orderBy,
-    });
-  }
-
   async createUserClient(
     params: CreateUserClient,
   ): Promise<ClientJToken | ErrorReturn> {
