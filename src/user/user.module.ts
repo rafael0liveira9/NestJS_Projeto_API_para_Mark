@@ -4,6 +4,7 @@ import { UserController } from './user.controller';
 import { PrismaService } from 'src/singleServices/prisma.service';
 import { JwtService } from 'src/singleServices/jwt.service';
 import { AutheticationUserMiddleware } from 'src/middlewares/authenticationUser.middleware';
+import { AuthenticationAdminMiddleware } from 'src/middlewares/authenticationAdmin.middleware';
 
 @Module({
   controllers: [UserController],
@@ -13,6 +14,13 @@ export class UserModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AutheticationUserMiddleware)
-      .forRoutes({ path: '/user', method: RequestMethod.GET });
+      .forRoutes({ path: '/user', method: RequestMethod.GET })
+      .apply(AuthenticationAdminMiddleware)
+      .forRoutes(
+        { path: '/user/all', method: RequestMethod.GET },
+        { path: '/user/:id', method: RequestMethod.GET },
+        { path: '/user/:id', method: RequestMethod.PATCH },
+        { path: '/user/:id', method: RequestMethod.DELETE },
+      );
   }
 }

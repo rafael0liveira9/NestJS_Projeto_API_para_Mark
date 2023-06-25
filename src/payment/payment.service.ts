@@ -597,12 +597,49 @@ export class PaymentService {
     return;
   }
 
-  findAll() {
-    return `This action returns all payment`;
+  async findAll() {
+    return await this.prisma.payments.findMany({
+      include: {
+        Client: {
+          include: {
+            User: {
+              select: {
+                email: true,
+                id: true,
+                roleTypeId: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} payment`;
+  async findOne(id) {
+    return await this.prisma.payments.findUnique({
+      where: {
+        uuid: id,
+      },
+      include: {
+        Client: {
+          include: {
+            User: true,
+          },
+        },
+        Companies: true,
+        PaymentsServices: {
+          include: {
+            Package: {
+              include: {
+                PackagesServices: true,
+              },
+            },
+            Payment: true,
+            Service: true,
+          },
+        },
+      },
+    });
   }
 
   update(id: number, updatePaymentDto: UpdatePaymentDto) {

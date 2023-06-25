@@ -14,6 +14,11 @@ import { AutheticationUserMiddleware } from 'src/middlewares/authenticationUser.
 export class PaymentModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
+      .apply(AuthenticationAdminMiddleware)
+      .forRoutes(
+        { path: '/payment/all', method: RequestMethod.GET },
+        { path: '/payment/:uuid', method: RequestMethod.GET },
+      )
       .apply(AutheticationUserMiddleware)
       .forRoutes({ path: '/payment/checkout', method: RequestMethod.POST });
   }

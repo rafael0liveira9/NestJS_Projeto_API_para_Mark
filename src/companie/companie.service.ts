@@ -52,7 +52,15 @@ export class CompanieService {
 
   async findAll() {
     try {
-      return await this.prisma.companies.findMany({});
+      return await this.prisma.companies.findMany({
+        include: {
+          Client: {
+            include: {
+              User: true,
+            },
+          },
+        },
+      });
     } catch (error) {
       throw new HttpException(
         {

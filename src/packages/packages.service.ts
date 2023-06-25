@@ -8,7 +8,6 @@ export class PackagesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createPackageDto: CreatePackageDto) {
-    console.log(createPackageDto);
     try {
       const packageCreate = await this.prisma.packages.create({
         data: {

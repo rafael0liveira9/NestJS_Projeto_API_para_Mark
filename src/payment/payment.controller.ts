@@ -28,14 +28,14 @@ export class PaymentController {
     return this.paymentService.webhookPayment(body);
   }
 
-  @Get()
+  @Get('all')
   findAll() {
     return this.paymentService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentService.findOne(+id);
+  @Get(':uuid')
+  findOne(@Param('uuid') id: string) {
+    return this.paymentService.findOne(id);
   }
 
   @Patch(':id')

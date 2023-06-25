@@ -23,7 +23,7 @@ export class AuthenticationAdminMiddleware implements NestMiddleware {
         token: req.headers.authorization,
       });
 
-      if (jwtData.roleType == 1) {
+      if (jwtData.roleType == 3) {
         req.userId = jwtData.userId;
         req.id = jwtData.id;
         req.roleType = jwtData.roleType;
