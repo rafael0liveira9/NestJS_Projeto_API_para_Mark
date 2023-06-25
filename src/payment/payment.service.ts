@@ -631,7 +631,11 @@ export class PaymentService {
           include: {
             Package: {
               include: {
-                PackagesServices: true,
+                PackagesServices: {
+                  include: {
+                    Service: true,
+                  },
+                },
               },
             },
             Payment: true,
