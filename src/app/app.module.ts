@@ -12,6 +12,8 @@ import { PaymentModule } from 'src/payment/payment.module';
 import { ContratedServicesModule } from 'src/contrated-services/contrated-services.module';
 import { UserModule } from 'src/user/user.module';
 import { PackagesModule } from 'src/packages/packages.module';
+import { ImagesModule } from 'src/images/images.module';
+import { SendImagesModule } from 'src/send-images/send-images.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { PackagesModule } from 'src/packages/packages.module';
     ContratedServicesModule,
     UserModule,
     PackagesModule,
+    ImagesModule,
+    SendImagesModule,
   ],
   controllers: [AppController],
   providers: [PrismaService, JwtService, AppService],
