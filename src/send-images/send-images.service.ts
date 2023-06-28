@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateSendImageDto } from './dto/create-send-image.dto';
-import { UpdateSendImageDto } from './dto/update-send-image.dto';
+
 import { UploaderService } from 'src/singleServices/uploader.service';
 import { Utils } from 'src/utils/utils';
 

@@ -10,8 +10,6 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { SendImagesService } from './send-images.service';
-import { CreateSendImageDto } from './dto/create-send-image.dto';
-import { UpdateSendImageDto } from './dto/update-send-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('send-images')
