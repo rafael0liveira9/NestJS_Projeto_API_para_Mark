@@ -14,13 +14,15 @@ import { UserModule } from 'src/user/user.module';
 import { PackagesModule } from 'src/packages/packages.module';
 import { ImagesModule } from 'src/images/images.module';
 import { SendImagesModule } from 'src/send-images/send-images.module';
+import { SocialModule } from 'src/social/social.module';
+import { SiteModule } from 'src/site/site.module';
+import { LogoModule } from 'src/logo/logo.module';
 
 @Module({
   imports: [
     AuthModule,
     CompanieModule,
     LeadModule,
-    ServiceModule,
     BriefingModule,
     PaymentModule,
     ContratedServicesModule,
@@ -28,6 +30,10 @@ import { SendImagesModule } from 'src/send-images/send-images.module';
     PackagesModule,
     ImagesModule,
     SendImagesModule,
+    ServiceModule,
+    SocialModule,
+    SiteModule,
+    LogoModule,
   ],
   controllers: [AppController],
   providers: [PrismaService, JwtService, AppService],

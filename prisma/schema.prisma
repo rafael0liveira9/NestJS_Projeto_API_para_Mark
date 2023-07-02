@@ -91,12 +91,16 @@ model Errors {
 }
 
 model Images {
-  id        Int       @id @default(autoincrement())
-  url       String
-  title     String
-  author    String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime?
+  id               Int                @id @default(autoincrement())
+  url              String
+  title            String
+  author           String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime?
+  SocialFeedShow   SocialFeedShow[]
+  SiteProof        LogoProof[]
+  SiteProofMockups LogoProofMockups[]
+  LogoArchives     LogoArchives[]
 }
 
 model Lead {
@@ -120,7 +124,7 @@ model LogoBriefing {
   mockups        String?
   LogoService    LogoService[]
 
-  @@index([id])
+  // @@index([id])
 }
 
 model LogoContratedItems {
@@ -137,11 +141,57 @@ model LogoService {
   createdAt          DateTime             @default(now())
   updatedAt          DateTime?
   dueDate            DateTime?
+  feedbackSended     Boolean?             @default(false)
   serviceTypeId      Int?                 @default(3)
+  logoBriefingId     Int?
+  logoProofId        Int?
   LogoBriefing       LogoBriefing?        @relation(fields: [logoBriefingId], references: [id])
   LogoContratedItems LogoContratedItems[]
   ServiceType        ServiceType?         @relation(fields: [serviceTypeId], references: [id])
-  logoBriefingId     Int?
+  LogoProof          LogoProof?           @relation(fields: [logoProofId], references: [id])
+  logoFeedbackId     Int?
+  LogoFeedback       LogoFeedback?        @relation(fields: [logoFeedbackId], references: [id])
+  LogoArchives       LogoArchives[]
+}
+
+model LogoFeedback {
+  id          Int           @id @default(autoincrement())
+  stars       Float
+  comments    String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime?
+  LogoService LogoService[]
+}
+
+model LogoArchives {
+  id            Int          @id @default(autoincrement())
+  name          String
+  type          String
+  url           String
+  previewId     Int
+  preview       Images       @relation(fields: [previewId], references: [id])
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime?
+  logoServiceId Int?
+  LogoService   LogoService? @relation(fields: [logoServiceId], references: [id])
+}
+
+model LogoProof {
+  id           Int                @id @default(autoincrement())
+  isApproved   Boolean?
+  reasonRefuse String?
+  imagesId     Int
+  proofImage   Images             @relation(fields: [imagesId], references: [id])
+  Mockups      LogoProofMockups[]
+  LogoService  LogoService[]
+}
+
+model LogoProofMockups {
+  id          Int        @id @default(autoincrement())
+  imagesId    Int
+  image       Images     @relation(fields: [imagesId], references: [id])
+  logoProofId Int?
+  LogoProof   LogoProof? @relation(fields: [logoProofId], references: [id])
 }
 
 model Packages {
@@ -235,7 +285,7 @@ model SiteBriefing {
   socialMidia String?
   SiteService SiteService[]
 
-  @@index([id])
+  // @@index([id])
 }
 
 model SiteContratedItems {
@@ -269,7 +319,7 @@ model SocialBriefing {
   mediaFormat   MediaFormat
   SocialService SocialService[]
 
-  @@index([id])
+  // @@index([id])
 }
 
 model SocialContratedItems {
@@ -287,10 +337,35 @@ model SocialService {
   updatedAt            DateTime?
   dueDate              DateTime?
   serviceTypeId        Int?                   @default(2)
+  socialShowId         Int?
+  socialBriefingId     Int?
+  SocialShow           SocialShow?            @relation(fields: [socialShowId], references: [id])
   SocialBriefing       SocialBriefing?        @relation(fields: [socialBriefingId], references: [id])
   SocialContratedItems SocialContratedItems[]
   ServiceType          ServiceType?           @relation(fields: [serviceTypeId], references: [id])
-  socialBriefingId     Int?
+}
+
+model SocialShow {
+  id               Int              @id @default(autoincrement())
+  allApproved      Boolean?
+  isSendedByClient Boolean?
+  isRefused        Boolean          @default(false)
+  feed             SocialFeedShow[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime?
+  SocialService    SocialService[]
+}
+
+model SocialFeedShow {
+  id           Int                @id @default(autoincrement())
+  text         String
+  type         SocialFeedShowType
+  imagesId     Int?
+  socialShowId Int?
+  approved     Boolean?
+  reasonRefuse String?
+  SocialShow   SocialShow?        @relation(fields: [socialShowId], references: [id])
+  Images       Images?            @relation(fields: [imagesId], references: [id])
 }
 
 model Tables {
@@ -402,4 +477,11 @@ enum SocialStatus {
   AMOSTRA
   CRIACAO
   APROVACAO
+  FINALIZADO
+}
+
+enum SocialFeedShowType {
+  VIDEO
+  IMAGE
+  ARRAY_IMAGE
 }

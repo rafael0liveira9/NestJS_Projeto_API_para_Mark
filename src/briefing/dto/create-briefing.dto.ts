@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { FormatStyles, SocialImageBase } from '@prisma/client';
+import {
+  EspecificationTypes,
+  FormatStyles,
+  MediaFormat,
+  NetworkTypes,
+  SocialImageBase,
+  SocialMaterialQuant,
+  SocialServiceTypes,
+} from '@prisma/client';
 
 class CreateBriefingDefaultData {
   @ApiProperty()
@@ -16,7 +24,7 @@ export class CreateBriefingLogoDto extends CreateBriefingDefaultData {
   @ApiProperty()
   typography: string;
   @ApiProperty()
-  especification: 'EMPRESA' | 'PRODUTO' | 'SERVICO';
+  especification: EspecificationTypes;
   @ApiProperty()
   references: string;
   @ApiProperty()
@@ -42,20 +50,15 @@ export class CreateBriefingSiteDto extends CreateBriefingDefaultData {
 
 export class CreateBriefingSocialDto extends CreateBriefingDefaultData {
   @ApiProperty()
-  network: 'FACEBOOK' | 'INSTAGRAM' | 'TIKTOK' | 'YOUTUBE' | 'LINKEDIN';
+  network: NetworkTypes;
   @ApiProperty()
   image: SocialImageBase;
   @ApiProperty()
-  materiaQuantity: 'DIARIO' | 'SEMANAL' | 'MENSAL';
+  materiaQuantity: SocialMaterialQuant;
   @ApiProperty()
-  materiaFormat: 'FEED' | 'STORIES' | 'REELS';
+  materiaFormat: MediaFormat;
   @ApiProperty()
-  service:
-    | 'PLANEJAMENTO_GERAL'
-    | 'PLANEJAMENTO_REDACIONAL'
-    | 'PLANEJAMENTO_VISUAL'
-    | 'PLANEJAMENTO_POSTAGENS'
-    | 'PLANEJAMENTO_GESTAO';
+  service: SocialServiceTypes;
   @ApiProperty()
   daysHours: string;
 }

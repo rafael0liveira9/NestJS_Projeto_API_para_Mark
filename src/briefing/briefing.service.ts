@@ -77,6 +77,7 @@ export class BriefingService {
         );
       }
     } catch (error) {
+      console.log(error);
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -86,7 +87,6 @@ export class BriefingService {
       );
     }
   }
-
   async createSite(createBriefingDto: CreateBriefingSiteDto) {
     try {
       const data = await this.prisma.contratedService.findFirst({
@@ -151,6 +151,7 @@ export class BriefingService {
         );
       }
     } catch (error) {
+      console.log(error);
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -192,23 +193,13 @@ export class BriefingService {
           data: {
             status: 'PLANEJAMENTO',
             SocialBriefing: {
-              upsert: {
-                create: {
-                  networkType: createBriefingDto.network,
-                  serviceType: createBriefingDto.service,
-                  imageBase: createBriefingDto.image,
-                  materialQuant: createBriefingDto.materiaQuantity,
-                  daysHours: createBriefingDto.daysHours,
-                  mediaFormat: createBriefingDto.materiaFormat,
-                },
-                update: {
-                  networkType: createBriefingDto.network,
-                  serviceType: createBriefingDto.service,
-                  imageBase: createBriefingDto.image,
-                  materialQuant: createBriefingDto.materiaQuantity,
-                  daysHours: createBriefingDto.daysHours,
-                  mediaFormat: createBriefingDto.materiaFormat,
-                },
+              create: {
+                networkType: createBriefingDto.network,
+                serviceType: createBriefingDto.service,
+                imageBase: createBriefingDto.image,
+                materialQuant: createBriefingDto.materiaQuantity,
+                daysHours: createBriefingDto.daysHours,
+                mediaFormat: createBriefingDto.materiaFormat,
               },
             },
           },
@@ -224,6 +215,7 @@ export class BriefingService {
         );
       }
     } catch (error) {
+      console.log(error);
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
