@@ -12,24 +12,51 @@ export class LogoService {
   constructor(private readonly prisma: PrismaService) {}
 
   async toProof(createLogoDto: CreateLogoDto, req) {
-    return await this.prisma.logoService.update({
+    const logoService = await this.prisma.logoService.findUnique({
       where: {
         id: createLogoDto.id,
       },
-      data: {
-        status: 'PROVAS',
-        LogoProof: {
-          create: {
-            imagesId: createLogoDto.proof,
-            Mockups: {
-              create: createLogoDto.mockups.map((x) => ({
-                imagesId: x,
-              })),
+    });
+
+    if (logoService.status != 'CRIACAO') {
+      throw new HttpException(
+        {
+          Code: HttpStatus.CONFLICT,
+          Message: `Serviço não pode ser atualizado no momento.`,
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    try {
+      let itemData = await this.prisma.logoService.update({
+        where: {
+          id: createLogoDto.id,
+        },
+        data: {
+          status: 'PROVAS',
+          LogoProof: {
+            create: {
+              imagesId: createLogoDto.proof,
+              Mockups: {
+                create: createLogoDto.mockups.map((x) => ({
+                  imagesId: x,
+                })),
+              },
             },
           },
         },
-      },
-    });
+      });
+      return itemData;
+    } catch (error) {
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Um erro ocorreu na atualização do serviço. ${error}`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async updateProof(updateLogo: UpdateLogoDto, req) {
@@ -48,6 +75,8 @@ export class LogoService {
         HttpStatus.CONFLICT,
       );
     }
+
+    console.log(logoService);
 
     try {
       const upLogo = await this.prisma.logoService.update({
@@ -72,6 +101,7 @@ export class LogoService {
                 req.roleType == 3 || req.roleType == 2
                   ? false
                   : updateLogo.isApproved,
+              userSended: req.roleType == 3 || req.roleType == 2 ? false : true,
               Mockups: {
                 update: updateLogo.mockupsUp.map((x) => ({
                   where: {
@@ -89,6 +119,7 @@ export class LogoService {
 
       return upLogo;
     } catch (error) {
+      console.log(error);
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -189,5 +220,31 @@ export class LogoService {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  async serviceById(id: number) {
+    return await this.prisma.logoService.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        LogoArchives: {
+          include: {
+            preview: true,
+          },
+        },
+        LogoBriefing: true,
+        LogoFeedback: true,
+        LogoProof: {
+          include: {
+            Mockups: {
+              include: {
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 }

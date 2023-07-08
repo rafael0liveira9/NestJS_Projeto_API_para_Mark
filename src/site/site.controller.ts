@@ -1,34 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Put,
+  Req,
+} from '@nestjs/common';
 import { SiteService } from './site.service';
 import { CreateSiteDto } from './dto/create-site.dto';
 import { UpdateSiteDto } from './dto/update-site.dto';
+import { SelectLayoutDto } from './dto/select-layout.dto';
 
 @Controller('site')
 export class SiteController {
   constructor(private readonly siteService: SiteService) {}
 
-  @Post()
-  create(@Body() createSiteDto: CreateSiteDto) {
-    return this.siteService.create(createSiteDto);
+  @Post('to-layout')
+  toLayoutPost(@Body() createSiteDto: CreateSiteDto) {
+    return this.siteService.toLayout(createSiteDto);
   }
 
-  @Get()
-  findAll() {
-    return this.siteService.findAll();
+  @Put('to-show')
+  toShow(@Body() selectLayout: SelectLayoutDto, @Req() req) {
+    return this.siteService.toShow(selectLayout, req);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.siteService.findOne(+id);
+  @Put('save-show')
+  saveShow(@Body() selectLayout: SelectLayoutDto, @Req() req) {
+    return this.siteService.saveShow(selectLayout, req);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSiteDto: UpdateSiteDto) {
-    return this.siteService.update(+id, updateSiteDto);
+  @Put('to-layout-finished')
+  toLayoutFinished(@Body() selectLayout: SelectLayoutDto, @Req() req) {
+    return this.siteService.saveShow(selectLayout, req);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.siteService.remove(+id);
+  @Put('approve-layout')
+  approveLayout(@Body() selectLayout: SelectLayoutDto, @Req() req) {
+    return this.siteService.saveShow(selectLayout, req);
   }
 }

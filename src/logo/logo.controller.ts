@@ -40,4 +40,9 @@ export class LogoController {
   updateProof(@Body() updateLogo: UpdateLogoDto, @Req() req) {
     return this.logoService.updateProof(updateLogo, req);
   }
+
+  @Get(':id')
+  serviceById(@Param('id') id: string) {
+    return this.logoService.serviceById(+id);
+  }
 }

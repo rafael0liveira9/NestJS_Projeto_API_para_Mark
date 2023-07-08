@@ -17,31 +17,17 @@ export class ContratedServicesController {
     private readonly contratedServicesService: ContratedServicesService,
   ) {}
 
-  @Post()
-  create(@Body() createContratedServiceDto: CreateContratedServiceDto) {
-    return this.contratedServicesService.create(createContratedServiceDto);
-  }
-
   @Get()
   async findAll() {
     return await this.contratedServicesService.findAll();
   }
+  @Get('all')
+  async findAllAdmin() {
+    return await this.contratedServicesService.findAllAdmin();
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.contratedServicesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateContratedServiceDto: UpdateContratedServiceDto,
-  ) {
-    return this.contratedServicesService.update(+id, updateContratedServiceDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.contratedServicesService.remove(+id);
+    return this.contratedServicesService.findById(+id);
   }
 }

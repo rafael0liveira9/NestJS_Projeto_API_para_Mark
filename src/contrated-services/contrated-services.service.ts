@@ -48,15 +48,160 @@ export class ContratedServicesService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} contratedService`;
+  async findAllAdmin() {
+    const data = await this.prisma.contratedService.findMany({
+      include: {
+        Companies: true,
+        LogoContratedItems: {
+          include: {
+            LogoService: {
+              include: {
+                LogoArchives: {
+                  include: {
+                    preview: true,
+                  },
+                },
+                LogoBriefing: true,
+                LogoFeedback: true,
+                LogoProof: {
+                  include: {
+                    Mockups: {
+                      include: {
+                        image: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        SiteContratedItems: {
+          include: {
+            SiteService: {
+              include: {
+                SiteBriefing: true,
+                SiteLayoutBase: {
+                  include: {
+                    Layout: true,
+                  },
+                },
+                SiteLayoutFinished: {
+                  include: {
+                    LayoutFinshed: true,
+                  },
+                },
+                SiteLayoutSelected: {
+                  include: {
+                    LayoutSelected: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        SocialContratedItems: {
+          include: {
+            SocialService: {
+              include: {
+                SocialBriefing: true,
+                SocialShow: {
+                  include: {
+                    feed: {
+                      include: {
+                        Images: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return data;
   }
 
-  update(id: number, updateContratedServiceDto: UpdateContratedServiceDto) {
-    return `This action updates a #${id} contratedService`;
+  async findById(id: number) {
+    const data = await this.prisma.contratedService.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        Companies: true,
+        LogoContratedItems: {
+          include: {
+            LogoService: {
+              include: {
+                LogoArchives: {
+                  include: {
+                    preview: true,
+                  },
+                },
+                LogoBriefing: true,
+                LogoFeedback: true,
+                LogoProof: {
+                  include: {
+                    Mockups: {
+                      include: {
+                        image: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        SiteContratedItems: {
+          include: {
+            SiteService: {
+              include: {
+                SiteBriefing: true,
+                SiteLayoutBase: {
+                  include: {
+                    Layout: true,
+                  },
+                },
+                SiteLayoutFinished: {
+                  include: {
+                    LayoutFinshed: true,
+                  },
+                },
+                SiteLayoutSelected: {
+                  include: {
+                    LayoutSelected: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        SocialContratedItems: {
+          include: {
+            SocialService: {
+              include: {
+                SocialBriefing: true,
+                SocialShow: {
+                  include: {
+                    feed: {
+                      include: {
+                        Images: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return data;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} contratedService`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} contratedService`;
+  // }
 }

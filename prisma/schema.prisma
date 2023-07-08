@@ -91,16 +91,19 @@ model Errors {
 }
 
 model Images {
-  id               Int                @id @default(autoincrement())
-  url              String
-  title            String
-  author           String
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime?
-  SocialFeedShow   SocialFeedShow[]
-  SiteProof        LogoProof[]
-  SiteProofMockups LogoProofMockups[]
-  LogoArchives     LogoArchives[]
+  id                 Int                  @id @default(autoincrement())
+  url                String
+  title              String
+  author             String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime?
+  SocialFeedShow     SocialFeedShow[]
+  SiteProof          LogoProof[]
+  SiteProofMockups   LogoProofMockups[]
+  LogoArchives       LogoArchives[]
+  SiteLayoutsBase    SiteLayoutsBase[]
+  SiteLayoutSelected SiteLayoutSelected[]
+  SiteLayoutFinished SiteLayoutFinished[]
 }
 
 model Lead {
@@ -179,6 +182,7 @@ model LogoArchives {
 model LogoProof {
   id           Int                @id @default(autoincrement())
   isApproved   Boolean?
+  userSended   Boolean?
   reasonRefuse String?
   imagesId     Int
   proofImage   Images             @relation(fields: [imagesId], references: [id])
@@ -297,16 +301,47 @@ model SiteContratedItems {
 }
 
 model SiteService {
-  id                 Int                  @id @default(autoincrement())
-  status             SiteStatus
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime?
-  dueDate            DateTime?
-  serviceTypeId      Int?                 @default(1)
-  SiteBriefing       SiteBriefing?        @relation(fields: [siteBriefingId], references: [id])
-  SiteContratedItems SiteContratedItems[]
-  ServiceType        ServiceType?         @relation(fields: [serviceTypeId], references: [id])
-  siteBriefingId     Int?
+  id                   Int                  @id @default(autoincrement())
+  status               SiteStatus
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime?
+  dueDate              DateTime?
+  isPublished          Boolean?
+  serviceTypeId        Int?                 @default(1)
+  SiteBriefing         SiteBriefing?        @relation(fields: [siteBriefingId], references: [id])
+  SiteContratedItems   SiteContratedItems[]
+  ServiceType          ServiceType?         @relation(fields: [serviceTypeId], references: [id])
+  siteBriefingId       Int?
+  SiteLayoutBase       SiteLayoutsBase[]
+  siteLayoutSelectedId Int?
+  SiteLayoutSelected   SiteLayoutSelected?  @relation(fields: [siteLayoutSelectedId], references: [id])
+  siteLayoutFinishedId Int?
+  SiteLayoutFinished   SiteLayoutFinished?  @relation(fields: [siteLayoutFinishedId], references: [id])
+}
+
+model SiteLayoutsBase {
+  id            Int          @id @default(autoincrement())
+  name          String
+  layoutId      Int
+  Layout        Images       @relation(fields: [layoutId], references: [id])
+  siteServiceId Int?
+  SiteService   SiteService? @relation(fields: [siteServiceId], references: [id])
+}
+
+model SiteLayoutSelected {
+  id             Int           @id @default(autoincrement())
+  layoutId       Int?
+  LayoutSelected Images?       @relation(fields: [layoutId], references: [id])
+  SiteService    SiteService[]
+}
+
+model SiteLayoutFinished {
+  id            Int           @id @default(autoincrement())
+  isApproved    Boolean?
+  refuseReason  String?
+  layoutId      Int?
+  LayoutFinshed Images?       @relation(fields: [layoutId], references: [id])
+  SiteService   SiteService[]
 }
 
 model SocialBriefing {
