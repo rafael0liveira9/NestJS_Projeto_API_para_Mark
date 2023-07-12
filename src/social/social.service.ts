@@ -294,4 +294,24 @@ export class SocialService {
       );
     }
   }
+
+  async findById(id: number) {
+    return await this.prisma.socialService.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        SocialShow: {
+          include: {
+            feed: {
+              include: {
+                Images: true,
+              },
+            },
+          },
+        },
+        SocialBriefing: true,
+      },
+    });
+  }
 }

@@ -35,4 +35,9 @@ export class SocialController {
   updateApprove(@Body() updateShow: UpdateSocialShowDto, @Req() req) {
     return this.socialService.updateApproveFinal(updateShow, req);
   }
+
+  @Get(':id')
+  serviceById(@Param('id') id: string) {
+    return this.socialService.findById(+id);
+  }
 }
