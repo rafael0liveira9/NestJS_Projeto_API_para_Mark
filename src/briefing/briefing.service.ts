@@ -12,6 +12,7 @@ export class BriefingService {
   constructor(private prisma: PrismaService) {}
 
   async createLogo(createBriefingDto: CreateBriefingLogoDto) {
+    console.log(createBriefingDto);
     try {
       const data = await this.prisma.contratedService.findFirst({
         where: {
@@ -51,7 +52,6 @@ export class BriefingService {
                   especification: createBriefingDto.especification,
                   description: createBriefingDto.description,
                   references: createBriefingDto.references,
-                  mockups: createBriefingDto.mockups,
                 },
                 update: {
                   format: createBriefingDto.format,
@@ -60,7 +60,6 @@ export class BriefingService {
                   especification: createBriefingDto.especification,
                   description: createBriefingDto.description,
                   references: createBriefingDto.references,
-                  mockups: createBriefingDto.mockups,
                 },
               },
             },

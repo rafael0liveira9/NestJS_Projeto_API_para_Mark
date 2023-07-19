@@ -66,6 +66,8 @@ export class LogoService {
       },
     });
 
+    console.log(updateLogo);
+
     if (logoService.status == 'AVALIACAO') {
       throw new HttpException(
         {
@@ -77,6 +79,30 @@ export class LogoService {
     }
 
     console.log(logoService);
+
+    let mockups = {},
+      imageId = {};
+
+    if (updateLogo.mockupsUp != null) {
+      mockups = {
+        Mockups: {
+          update: updateLogo.mockupsUp.map((x) => ({
+            where: {
+              id: x.id,
+            },
+            data: {
+              imagesId: x.image,
+            },
+          })),
+        },
+      };
+    }
+
+    if (req.roleType == 3 || req.roleType == 2) {
+      imageId = {
+        imagesId: updateLogo.proof,
+      };
+    }
 
     try {
       const upLogo = await this.prisma.logoService.update({
@@ -92,7 +118,7 @@ export class LogoService {
               : 'PROVAS',
           LogoProof: {
             update: {
-              imagesId: updateLogo.proof,
+              ...imageId,
               reasonRefuse:
                 req.roleType == 3 || req.roleType == 2
                   ? ''
@@ -102,16 +128,7 @@ export class LogoService {
                   ? false
                   : updateLogo.isApproved,
               userSended: req.roleType == 3 || req.roleType == 2 ? false : true,
-              Mockups: {
-                update: updateLogo.mockupsUp.map((x) => ({
-                  where: {
-                    id: x.id,
-                  },
-                  data: {
-                    imagesId: x.image,
-                  },
-                })),
-              },
+              ...mockups,
             },
           },
         },
@@ -137,15 +154,17 @@ export class LogoService {
       },
     });
 
-    if (logoService.status != 'AVALIACAO') {
-      throw new HttpException(
-        {
-          Code: HttpStatus.CONFLICT,
-          Message: `Serviço não pode ser atualizado no momento.`,
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
+    // if (
+    //   logoService.status == 'AVALIACAO'
+    // ) {
+    //   throw new HttpException(
+    //     {
+    //       Code: HttpStatus.CONFLICT,
+    //       Message: `Serviço não pode ser atualizado no momento.`,
+    //     },
+    //     HttpStatus.CONFLICT,
+    //   );
+    // }
 
     try {
       const upLogo = await this.prisma.logoService.update({
@@ -162,6 +181,8 @@ export class LogoService {
           },
         },
       });
+
+      this.prisma.$disconnect();
 
       return upLogo;
     } catch (error) {
@@ -209,6 +230,8 @@ export class LogoService {
           },
         },
       });
+
+      this.prisma.$disconnect();
 
       return upLogo;
     } catch (error) {

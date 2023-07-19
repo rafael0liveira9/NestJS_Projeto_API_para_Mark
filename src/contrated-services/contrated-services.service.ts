@@ -17,11 +17,52 @@ export class ContratedServicesService {
         companiesId: 1,
       },
       include: {
+        Companies: true,
+        LogoContratedItems: {
+          include: {
+            LogoService: {
+              include: {
+                LogoArchives: {
+                  include: {
+                    preview: true,
+                  },
+                },
+                LogoBriefing: true,
+                LogoFeedback: true,
+                LogoProof: {
+                  include: {
+                    proofImage: true,
+                    Mockups: {
+                      include: {
+                        image: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         SiteContratedItems: {
           include: {
             SiteService: {
               include: {
                 SiteBriefing: true,
+                SiteLayoutBase: {
+                  include: {
+                    Layout: true,
+                  },
+                },
+                SiteLayoutFinished: {
+                  include: {
+                    LayoutFinshed: true,
+                  },
+                },
+                SiteLayoutSelected: {
+                  include: {
+                    LayoutSelected: true,
+                  },
+                },
               },
             },
           },
@@ -31,15 +72,15 @@ export class ContratedServicesService {
             SocialService: {
               include: {
                 SocialBriefing: true,
-              },
-            },
-          },
-        },
-        LogoContratedItems: {
-          include: {
-            LogoService: {
-              include: {
-                LogoBriefing: true,
+                SocialShow: {
+                  include: {
+                    feed: {
+                      include: {
+                        Images: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
