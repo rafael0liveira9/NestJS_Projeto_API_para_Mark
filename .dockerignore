@@ -39,3 +39,4 @@ coverage
 # flyctl launch added from .husky/_/.gitignore
 .husky/_/**/*
 fly.toml
+.env
