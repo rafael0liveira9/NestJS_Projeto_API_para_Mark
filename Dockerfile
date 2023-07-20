@@ -11,4 +11,4 @@ COPY package.json .
 
 RUN npm install
 EXPOSE 80
-CMD ["npx", "prisma", "db", "push", "&&", "npx", "prisma", "generate", "&&", "npm", "run", "build", "&&", "npm", "run", "start:prod"]
+CMD npx prisma db push && npx prisma generate && npm run build && npm run start:prod

@@ -12,11 +12,6 @@
                "hostPort": 80,
                "protocol": "tcp",
                "containerPort": 80
-            },
-            {
-               "hostPort": 443,
-               "protocol": "tcp",
-               "containerPort": 443
             }
          ],
          "command": [],
@@ -34,7 +29,7 @@
          "memoryReservation": null,
          "volumesFrom": [],
          "stopTimeout": null,
-         "image": "065249228369.dkr.ecr.us-east-2.amazonaws.com/mark-back",
+         "image": "065249228369.dkr.ecr.us-east-1.amazonaws.com/mark-back",
          "startTimeout": null,
          "firelensConfiguration": null,
          "dependsOn": null,
@@ -55,14 +50,14 @@
       }
    ],
    "placementConstraints": [],
-   "memory": "128",
+   "memory": "928",
    "taskRoleArn": null,
    "compatibilities": [
       "EXTERNAL",
       "EC2"
    ],
-   "taskDefinitionArn": "arn:aws:ecs:us-east-2:065249228369:task-definition/DeployContainer:4",
-   "family": "DeployContainer",
+   "taskDefinitionArn": "arn:aws:ecs:us-east-1:065249228369:task-definition/BuildContainer:1",
+   "family": "BuildContainer",
    "requiresAttributes": [
       {
          "targetId": null,
@@ -75,10 +70,10 @@
    "requiresCompatibilities": [
       "EC2"
    ],
-   "networkMode": null,
+   "networkMode": "bridge",
    "runtimePlatform": null,
    "cpu": "1024",
-   "revision": 4,
+   "revision": 1,
    "status": "ACTIVE",
    "inferenceAccelerators": null,
    "proxyConfiguration": null,
