@@ -201,10 +201,13 @@ export class AuthService {
             userExist.User.password,
           );
           if (!result) {
-            return {
-              Message: 'Senha incorreta!',
-              Code: HttpStatus.FORBIDDEN,
-            };
+            throw new HttpException(
+              {
+                Code: HttpStatus.CONFLICT,
+                Message: 'Email incorreto ou não encontrado',
+              },
+              HttpStatus.CONFLICT,
+            );
           }
           if (result) {
             var token = this.jwt.signJwt({
@@ -270,10 +273,13 @@ export class AuthService {
               userSecond.User.password,
             );
             if (!result) {
-              return {
-                Message: 'Senha incorreta!',
-                Code: HttpStatus.FORBIDDEN,
-              };
+              throw new HttpException(
+                {
+                  Code: HttpStatus.CONFLICT,
+                  Message: 'Email incorreto ou não encontrado',
+                },
+                HttpStatus.CONFLICT,
+              );
             }
             if (result) {
               var token = this.jwt.signJwt({
