@@ -119,7 +119,7 @@ export class PackagesService {
   }
 
   async remove(id: number) {
-    return await this.prisma.service.update({
+    return await this.prisma.packages.update({
       where: {
         id: id,
       },
