@@ -18,8 +18,23 @@ export class UserService {
     return await this.prisma.user.findMany({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(email: string) {
+    const userData = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!userData)
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Usuário não encontrado`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+
+    return userData;
   }
 
   async findMe(req) {
