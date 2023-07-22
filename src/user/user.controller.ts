@@ -41,8 +41,8 @@ export class UserController {
 
   @Put('update-password')
   @HttpCode(200)
-  update(@Body() UpdatePasswordDto: UpdatePasswordDto, @Req() req) {
-    return this.userService.updatePassword(UpdatePasswordDto, req);
+  update(@Body() UpdatePasswordDto: UpdatePasswordDto) {
+    return this.userService.updatePassword(UpdatePasswordDto);
   }
 
   @Delete(':id')

@@ -14,10 +14,7 @@ export class UserModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AutheticationUserMiddleware)
-      .forRoutes(
-        { path: '/user', method: RequestMethod.GET },
-        { path: '/user/update-password', method: RequestMethod.PUT },
-      )
+      .forRoutes({ path: '/user', method: RequestMethod.GET })
       .apply(AuthenticationAdminMiddleware)
       .forRoutes(
         { path: '/user/all', method: RequestMethod.GET },

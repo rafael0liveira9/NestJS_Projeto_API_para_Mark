@@ -59,12 +59,21 @@ export class UserService {
     }
   }
 
-  async updatePassword(updatePasswordDto: UpdatePasswordDto, req) {
+  async updatePassword(updatePasswordDto: UpdatePasswordDto) {
     const userdata = await this.prisma.user.findUnique({
       where: {
-        id: req.userId,
+        email: updatePasswordDto.email,
       },
     });
+
+    if (!userdata)
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Usuário não encontrado`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
 
     if (!updatePasswordDto.oldPassword || !updatePasswordDto.newPassword)
       throw new HttpException(
@@ -78,7 +87,7 @@ export class UserService {
     if (bcrypt.compare(userdata.password, updatePasswordDto.oldPassword)) {
       await this.prisma.user.update({
         where: {
-          id: req.userId,
+          email: updatePasswordDto.email,
         },
         data: {
           password: bcrypt.hashSync(updatePasswordDto.newPassword, 8),
