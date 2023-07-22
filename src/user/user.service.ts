@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/singleServices/prisma.service';
+
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -56,8 +59,42 @@ export class UserService {
     }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async updatePassword(updatePasswordDto: UpdatePasswordDto, req) {
+    const userdata = await this.prisma.user.findUnique({
+      where: {
+        id: req.userId,
+      },
+    });
+
+    if (!updatePasswordDto.oldPassword || !updatePasswordDto.newPassword)
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Digite uma senha para alterar`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+
+    if (bcrypt.compare(userdata.password, updatePasswordDto.oldPassword)) {
+      await this.prisma.user.update({
+        where: {
+          id: req.userId,
+        },
+        data: {
+          password: bcrypt.hashSync(updatePasswordDto.newPassword, 8),
+        },
+      });
+
+      return 'Senha Alterada com Sucesso';
+    } else {
+      throw new HttpException(
+        {
+          Code: HttpStatus.CONFLICT,
+          Message: `Usuário não encontrado.`,
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
   }
 
   remove(id: number) {

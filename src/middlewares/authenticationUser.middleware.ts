@@ -23,8 +23,6 @@ export class AutheticationUserMiddleware implements NestMiddleware {
         token: req.headers.authorization,
       });
 
-      console.log(jwtData);
-
       if (jwtData.roleType <= 3) {
         req.userId = jwtData.userId;
         req.id = jwtData.id;

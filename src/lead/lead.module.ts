@@ -20,9 +20,6 @@ export class LeadModule {
         { path: '/lead/:id', method: RequestMethod.GET },
       )
       .apply(AutheticationUserMiddleware)
-      .forRoutes(
-        { path: '/lead', method: RequestMethod.POST },
-        { path: '/lead/:id', method: RequestMethod.PUT },
-      );
+      .forRoutes({ path: '/lead/:id', method: RequestMethod.PUT });
   }
 }
