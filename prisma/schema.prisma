@@ -38,7 +38,8 @@ model Client {
   updatedAt        DateTime?
   userId           Int
   User             User               @relation(fields: [userId], references: [id])
-  Companies        Companies[]
+  companiesId      Int?
+  Companie         Companies?         @relation(fields: [companiesId], references: [id])
   Payments         Payments[]
   PaymentsServices PaymentsServices[]
 }
@@ -48,14 +49,13 @@ model Companies {
   companyName      String
   document         String             @unique
   documentType     String
-  clientId         Int?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime?
   Cards            Cards[]
-  Client           Client?            @relation(fields: [clientId], references: [id])
   ContratedService ContratedService[]
   Payments         Payments[]
   PaymentsServices PaymentsServices[]
+  Client           Client[]
 }
 
 model ContratedService {

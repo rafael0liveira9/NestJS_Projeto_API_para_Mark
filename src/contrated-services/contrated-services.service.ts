@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateContratedServiceDto } from './dto/create-contrated-service.dto';
 import { UpdateContratedServiceDto } from './dto/update-contrated-service.dto';
 import { PrismaService } from 'src/singleServices/prisma.service';
@@ -11,82 +11,115 @@ export class ContratedServicesService {
     return 'This action adds a new contratedService';
   }
 
-  async findAll() {
-    return await this.prisma.contratedService.findFirst({
+  async findAll(req) {
+    const userData = await this.prisma.client.findUnique({
       where: {
-        companiesId: 1,
+        id: +req.id,
       },
       include: {
-        Companies: true,
-        LogoContratedItems: {
-          include: {
-            LogoService: {
-              include: {
-                LogoArchives: {
-                  include: {
-                    preview: true,
-                  },
-                },
-                LogoBriefing: true,
-                LogoFeedback: true,
-                LogoProof: {
-                  include: {
-                    proofImage: true,
-                    Mockups: {
-                      include: {
-                        image: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        SiteContratedItems: {
-          include: {
-            SiteService: {
-              include: {
-                SiteBriefing: true,
-                SiteLayoutBase: {
-                  include: {
-                    Layout: true,
-                  },
-                },
-                SiteLayoutFinished: {
-                  include: {
-                    LayoutFinshed: true,
-                  },
-                },
-                SiteLayoutSelected: {
-                  include: {
-                    LayoutSelected: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-        SocialContratedItems: {
-          include: {
-            SocialService: {
-              include: {
-                SocialBriefing: true,
-                SocialShow: {
-                  include: {
-                    feed: {
-                      include: {
-                        Images: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+        Companie: true,
       },
     });
+
+    if (!userData.Companie) {
+      throw new HttpException(
+        {
+          Code: HttpStatus.NOT_FOUND,
+          Message: 'Sem empresa Cadastrada',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (userData) {
+      try {
+        const contratedServices = await this.prisma.contratedService.findFirst({
+          where: {
+            companiesId: userData.Companie.id,
+          },
+          include: {
+            Companies: true,
+            LogoContratedItems: {
+              include: {
+                LogoService: {
+                  include: {
+                    LogoArchives: {
+                      include: {
+                        preview: true,
+                      },
+                    },
+                    LogoBriefing: true,
+                    LogoFeedback: true,
+                    LogoProof: {
+                      include: {
+                        proofImage: true,
+                        Mockups: {
+                          include: {
+                            image: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            SiteContratedItems: {
+              include: {
+                SiteService: {
+                  include: {
+                    SiteBriefing: true,
+                    SiteLayoutBase: {
+                      include: {
+                        Layout: true,
+                      },
+                    },
+                    SiteLayoutFinished: {
+                      include: {
+                        LayoutFinshed: true,
+                      },
+                    },
+                    SiteLayoutSelected: {
+                      include: {
+                        LayoutSelected: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            SocialContratedItems: {
+              include: {
+                SocialService: {
+                  include: {
+                    SocialBriefing: true,
+                    SocialShow: {
+                      include: {
+                        feed: {
+                          include: {
+                            Images: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        });
+        this.prisma.$disconnect();
+        return contratedServices;
+      } catch (error) {
+        throw new HttpException(
+          {
+            Code: HttpStatus.BAD_REQUEST,
+            Message: 'Ocorreu um erro ao buscar serviços',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
   }
 
   async findAllAdmin() {
@@ -241,8 +274,4 @@ export class ContratedServicesService {
     });
     return data;
   }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} contratedService`;
-  // }
 }

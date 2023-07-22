@@ -26,12 +26,12 @@ export class PaymentService {
         id: req.id,
       },
       include: {
-        Companies: true,
+        Companie: true,
         User: true,
       },
     });
 
-    if (clientData.Companies.length > 0) {
+    if (clientData.Companie) {
       const uuidPayment = uuidv4();
 
       try {
@@ -49,7 +49,7 @@ export class PaymentService {
             ccv: createPaymentDto.paymentMethod.creditCard.ccv,
           },
           userInfo: {
-            name: clientData.Companies[0].companyName,
+            name: clientData.Companie.companyName,
             email: clientData.User.email,
             phoneNumber: clientData.phone,
             addressNumber: clientData.document,
@@ -93,7 +93,7 @@ export class PaymentService {
         PaymentsServices: true,
         Client: {
           include: {
-            Companies: true,
+            Companie: true,
           },
         },
       },
@@ -550,7 +550,7 @@ export class PaymentService {
   private async sendPaymentData(
     createPaymentDto: CreatePaymentDto,
     clientData: Client & {
-      Companies: Companies[];
+      Companie: Companies;
       User: User;
     },
     totalVal: number,
@@ -563,7 +563,7 @@ export class PaymentService {
       data: {
         uuid,
         clientId: clientData.id,
-        companiesId: clientData.Companies[0].id,
+        companiesId: clientData.Companie.id,
         value: totalVal,
         discount: discount,
         voucherId,
@@ -575,17 +575,17 @@ export class PaymentService {
             ? typeof createPaymentDto.service == 'number'
               ? {
                   clientId: clientData.id,
-                  companiesId: clientData.Companies[0].id,
+                  companiesId: clientData.Companie.id,
                   serviceId: createPaymentDto.service,
                 }
               : createPaymentDto.service.map((x) => ({
                   clientId: clientData.id,
-                  companiesId: clientData.Companies[0].id,
+                  companiesId: clientData.Companie.id,
                   serviceId: x,
                 }))
             : {
                 clientId: clientData.id,
-                companiesId: clientData.Companies[0].id,
+                companiesId: clientData.Companie.id,
                 serviceId: createPaymentDto.package,
               },
         },

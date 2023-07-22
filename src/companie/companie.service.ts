@@ -22,7 +22,11 @@ export class CompanieService {
             companyName: createCompanieDto.companyName,
             documentType: createCompanieDto.documentType,
             updatedAt: new Date(),
-            clientId: req.id,
+            Client: {
+              connect: {
+                id: req.id,
+              },
+            },
           },
           include: {
             ContratedService: {
