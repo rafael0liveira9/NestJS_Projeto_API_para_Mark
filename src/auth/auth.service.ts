@@ -83,11 +83,23 @@ export class AuthService {
           }),
         };
       } else {
-        return { Message: 'Usuário já existe, tente outro email', Code: 400 };
+        throw new HttpException(
+          {
+            Code: HttpStatus.CONFLICT,
+            Message: 'Usuário já existe, tente outro email',
+          },
+          HttpStatus.CONFLICT,
+        );
       }
     } catch (error) {
       console.log(error);
-      return { Message: error.toString(), Code: 500 };
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: error.toString(),
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -222,10 +234,13 @@ export class AuthService {
             return { ...userExistData, jwt: token };
           }
         } else {
-          return {
-            Message: 'Usuário não existe, tente outro email',
-            Code: HttpStatus.NOT_FOUND,
-          };
+          throw new HttpException(
+            {
+              Code: HttpStatus.CONFLICT,
+              Message: 'Email incorreto ou não encontrado',
+            },
+            HttpStatus.CONFLICT,
+          );
         }
       } else {
         let userSecond = await this.prisma.employee.findFirst({
@@ -290,16 +305,22 @@ export class AuthService {
               };
             }
           } else {
-            return {
-              Message: 'Usuário não existe!',
-              Code: HttpStatus.NOT_FOUND,
-            };
+            throw new HttpException(
+              {
+                Code: HttpStatus.CONFLICT,
+                Message: 'Email incorreto ou não encontrado',
+              },
+              HttpStatus.CONFLICT,
+            );
           }
         } else {
-          return {
-            Message: 'Email incorreto ou não encontrado',
-            Code: HttpStatus.FORBIDDEN,
-          };
+          throw new HttpException(
+            {
+              Code: HttpStatus.CONFLICT,
+              Message: 'Email incorreto ou não encontrado',
+            },
+            HttpStatus.CONFLICT,
+          );
         }
       }
     } catch (error) {

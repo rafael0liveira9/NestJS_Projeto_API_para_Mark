@@ -61,8 +61,6 @@ export class PackagesService {
       },
     });
 
-    console.log(data);
-
     if (packageSearch.value != null) {
       data = data.filter(
         (x) =>
