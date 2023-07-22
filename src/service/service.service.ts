@@ -35,6 +35,7 @@ export class ServiceService {
         name: {
           contains: search || '',
         },
+        deletedAt: null,
       },
       orderBy: {
         price: sort == 1 ? 'asc' : sort == 2 ? 'desc' : 'asc',
@@ -70,9 +71,12 @@ export class ServiceService {
   }
 
   async remove(id: number) {
-    return await this.prisma.service.delete({
+    return await this.prisma.service.update({
       where: {
         id: id,
+      },
+      data: {
+        deletedAt: new Date(),
       },
     });
   }

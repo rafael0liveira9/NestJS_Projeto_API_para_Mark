@@ -204,6 +204,7 @@ model Packages {
   description      String
   createdAt        DateTime           @default(now())
   updatedAt        DateTime?
+  deletedAt        DateTime?
   dueDate          DateTime?
   PackagesServices PackagesServices[]
   PaymentsServices PaymentsServices[]
@@ -263,6 +264,7 @@ model Service {
   description      String
   createdAt        DateTime           @default(now())
   updatedAt        DateTime?
+  deletedAt        DateTime?
   serviceTypeId    Int
   PackagesServices PackagesServices[]
   ServiceType      ServiceType        @relation(fields: [serviceTypeId], references: [id])

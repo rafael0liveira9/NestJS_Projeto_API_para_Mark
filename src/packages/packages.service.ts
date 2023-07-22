@@ -118,7 +118,14 @@ export class PackagesService {
     return `This action updates a #${id} package`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} package`;
+  async remove(id: number) {
+    return await this.prisma.service.update({
+      where: {
+        id: id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
   }
 }

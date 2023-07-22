@@ -10,33 +10,34 @@ export class LeadService {
   async create(createLeadDto: CreateLeadDto) {
     const { name, email, phone } = createLeadDto;
 
+    const dataExist = await this.prisma.lead.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (dataExist) {
+      throw new HttpException(
+        {
+          Code: HttpStatus.CONFLICT,
+          Message: 'Usuário já existe',
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+
     try {
-      const dataExist = await this.prisma.lead.findUnique({
-        where: {
-          email: email,
+      const lead = await this.prisma.lead.create({
+        data: {
+          name,
+          email,
+          phone,
         },
       });
 
-      if (!dataExist) {
-        const lead = await this.prisma.lead.create({
-          data: {
-            name,
-            email,
-            phone,
-          },
-        });
-
-        return lead;
-      } else {
-        throw new HttpException(
-          {
-            Code: HttpStatus.CONFLICT,
-            Message: 'Usuário já existe',
-          },
-          HttpStatus.CONFLICT,
-        );
-      }
+      return lead;
     } catch (error) {
+      console.log(error);
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,

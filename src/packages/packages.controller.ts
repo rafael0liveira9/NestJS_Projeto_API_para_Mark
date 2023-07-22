@@ -30,4 +30,9 @@ export class PackagesController {
   findOne(@Body() packagesSearch: PackagesSearch) {
     return this.packagesService.findByValues(packagesSearch);
   }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.packagesService.remove(+id);
+  }
 }
