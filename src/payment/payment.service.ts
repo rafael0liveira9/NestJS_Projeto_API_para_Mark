@@ -6,6 +6,7 @@ import { AsaasService } from 'src/singleServices/asaas.service';
 import { Client, Companies, User } from '@prisma/client';
 
 import { v4 as uuidv4 } from 'uuid';
+import { AsanaService } from 'src/singleServices/asana.service';
 
 @Injectable()
 export class PaymentService {
@@ -111,8 +112,14 @@ export class PaymentService {
       },
     });
 
-    const userContratedService = await this.prisma.contratedService.findFirst({
+    let userContratedService = await this.prisma.contratedService.upsert({
       where: {
+        id: paymentData.companiesId,
+      },
+      create: {
+        companiesId: paymentData.companiesId,
+      },
+      update: {
         companiesId: paymentData.companiesId,
       },
     });
@@ -467,8 +474,6 @@ export class PaymentService {
         });
 
         await this.finishCheckout(req.payment.externalReference);
-
-        await this.sendToAsana();
       }
 
       return '';
@@ -601,10 +606,6 @@ export class PaymentService {
         },
       },
     });
-  }
-
-  private async sendToAsana() {
-    return;
   }
 
   async findAll() {

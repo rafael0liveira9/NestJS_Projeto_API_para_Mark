@@ -22,6 +22,10 @@ export class CreateBriefingLogoDto extends CreateBriefingDefaultData {
   @ApiProperty()
   cores: string;
   @ApiProperty()
+  title: string;
+  @ApiProperty()
+  subtitle: string;
+  @ApiProperty()
   typography: string;
   @ApiProperty()
   especification: EspecificationTypes;

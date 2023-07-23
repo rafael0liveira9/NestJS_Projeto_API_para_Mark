@@ -24,8 +24,6 @@ export class AutheticationUserMiddleware implements NestMiddleware {
         token: req.headers.authorization,
       });
 
-      console.log();
-
       const userData = await this.prisma.user.findUnique({
         where: {
           id: jwtData.userId,

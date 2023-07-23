@@ -129,7 +129,7 @@ export class AuthService {
                 email: params.email,
                 password: await bcrypt.hash(params.password, 8),
                 firebaseToken: params.firebaseToken,
-                roleTypeId: !params.isAdmin ? 2 : 1,
+                roleTypeId: !params.isAdmin ? 2 : 3,
               },
             },
           },

@@ -6,10 +6,11 @@ import {
 } from './dto/create-briefing.dto';
 import { UpdateBriefingDto } from './dto/update-briefing.dto';
 import { PrismaService } from 'src/singleServices/prisma.service';
+import { AsanaService } from 'src/singleServices/asana.service';
 
 @Injectable()
 export class BriefingService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private asana: AsanaService) {}
 
   async createLogo(createBriefingDto: CreateBriefingLogoDto) {
     try {
@@ -27,6 +28,7 @@ export class BriefingService {
           ],
         },
         include: {
+          Companies: true,
           LogoContratedItems: {
             where: {
               id: createBriefingDto.id,
@@ -51,6 +53,8 @@ export class BriefingService {
                   especification: createBriefingDto.especification,
                   description: createBriefingDto.description,
                   references: createBriefingDto.references,
+                  titlefirst: createBriefingDto.title,
+                  titlesecond: createBriefingDto.subtitle,
                 },
                 update: {
                   format: createBriefingDto.format,
@@ -59,16 +63,35 @@ export class BriefingService {
                   especification: createBriefingDto.especification,
                   description: createBriefingDto.description,
                   references: createBriefingDto.references,
+                  titlefirst: createBriefingDto.title,
+                  titlesecond: createBriefingDto.subtitle,
                 },
               },
             },
           },
         });
+
+        await this.asana.createTask(
+          `Logo / ${data.Companies.companyName}`,
+          `
+          BRIEFING:
+          Título Principal: ${createBriefingDto.title},
+          Título Secundário: ${createBriefingDto.subtitle},
+          Formato: ${createBriefingDto.format},
+          Cores: ${createBriefingDto.cores},
+          Tipografia: ${createBriefingDto.typography},
+          Especificação: ${createBriefingDto.especification},
+          Descrição: ${createBriefingDto.description},
+          Referencias: ${createBriefingDto.references},
+        `,
+        );
+
         return serviceBriefing;
       } else {
         throw Error('Nenhum serviço encontrado.');
       }
     } catch (error) {
+      console.log(error?.response.data);
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -94,6 +117,7 @@ export class BriefingService {
           ],
         },
         include: {
+          Companies: true,
           SiteContratedItems: {
             where: {
               id: createBriefingDto.id,
@@ -131,6 +155,21 @@ export class BriefingService {
             },
           },
         });
+
+        await this.asana.createTask(
+          `Logo / ${data.Companies.companyName}`,
+          `
+          BRIEFING:
+
+          Modelo do Site: ${createBriefingDto.siteModel},
+          URL do Site: ${createBriefingDto.url},
+          Referencias: ${createBriefingDto.references},
+          Logo: ${createBriefingDto.logo},
+          Dados de Contato: ${createBriefingDto.contactData},
+          Social Media: ${createBriefingDto.socialMidia},
+        `,
+        );
+
         return serviceBriefing;
       } else {
         throw new HttpException(
@@ -168,6 +207,7 @@ export class BriefingService {
           ],
         },
         include: {
+          Companies: true,
           SocialContratedItems: {
             where: {
               id: createBriefingDto.id,
@@ -195,6 +235,21 @@ export class BriefingService {
             },
           },
         });
+
+        await this.asana.createTask(
+          `Logo / ${data.Companies.companyName}`,
+          `
+          BRIEFING:
+
+          Tipo de Network: ${createBriefingDto.network},
+          Tipo do Serviço: ${createBriefingDto.service},
+          Base das Imagens: ${createBriefingDto.image},
+          Quantidade de Material: ${createBriefingDto.materiaQuantity},
+          Horas e Dias: ${createBriefingDto.daysHours},
+          Formato da Media: ${createBriefingDto.materiaFormat},
+        `,
+        );
+
         return serviceBriefing;
       } else {
         throw new HttpException(

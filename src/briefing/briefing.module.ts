@@ -5,10 +5,11 @@ import { JwtService } from 'src/singleServices/jwt.service';
 import { PrismaService } from 'src/singleServices/prisma.service';
 import { AuthenticationAdminMiddleware } from 'src/middlewares/authenticationAdmin.middleware';
 import { AutheticationUserMiddleware } from 'src/middlewares/authenticationUser.middleware';
+import { AsanaService } from 'src/singleServices/asana.service';
 
 @Module({
   controllers: [BriefingController],
-  providers: [BriefingService, JwtService, PrismaService],
+  providers: [BriefingService, JwtService, PrismaService, AsanaService],
 })
 export class BriefingModule {
   configure(consumer: MiddlewareConsumer) {

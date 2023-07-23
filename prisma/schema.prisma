@@ -63,7 +63,7 @@ model Companies {
 
 model ContratedService {
   id                   Int                    @id @default(autoincrement())
-  companiesId          Int
+  companiesId          Int                    @unique
   Companies            Companies              @relation(fields: [companiesId], references: [id])
   LogoContratedItems   LogoContratedItems[]
   SiteContratedItems   SiteContratedItems[]

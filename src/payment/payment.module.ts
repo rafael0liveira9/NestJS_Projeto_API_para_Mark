@@ -6,10 +6,17 @@ import { PrismaService } from 'src/singleServices/prisma.service';
 import { AsaasService } from 'src/singleServices/asaas.service';
 import { AuthenticationAdminMiddleware } from 'src/middlewares/authenticationAdmin.middleware';
 import { AutheticationUserMiddleware } from 'src/middlewares/authenticationUser.middleware';
+import { AsanaService } from 'src/singleServices/asana.service';
 
 @Module({
   controllers: [PaymentController],
-  providers: [PaymentService, JwtService, PrismaService, AsaasService],
+  providers: [
+    PaymentService,
+    JwtService,
+    PrismaService,
+    AsaasService,
+    AsanaService,
+  ],
 })
 export class PaymentModule {
   configure(consumer: MiddlewareConsumer) {
