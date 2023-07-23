@@ -12,14 +12,19 @@ export class PaymentService {
   constructor(private prisma: PrismaService, private asaas: AsaasService) {}
 
   async checkout(createPaymentDto: CreatePaymentDto, @Req() req) {
-    let valueTotal = await this.calculateValue(createPaymentDto);
+    let valueTotal = { price: 0, value: 0 };
+    valueTotal = await this.calculateValue(createPaymentDto);
+
     return this.checkoutPayment(createPaymentDto, req, valueTotal);
   }
 
   private async checkoutPayment(
     createPaymentDto: CreatePaymentDto,
     @Req() req,
-    valueTotal: number,
+    valueTotal: {
+      price: number;
+      value: number;
+    },
   ) {
     const clientData = await this.prisma.client.findUnique({
       where: {
@@ -38,9 +43,11 @@ export class PaymentService {
         const payment = await this.asaas.createPaymentCreditCard({
           costumer: clientData.costumerId,
           dueDate: '2023-10-05',
-          value: valueTotal,
+          value: valueTotal.price,
           description: 'Produto comprado',
           externalReference: `${uuidPayment}`,
+          valueInstall: valueTotal.value,
+          installments: createPaymentDto.installments,
           creditCard: {
             holderName: createPaymentDto.paymentMethod.creditCard.holderName,
             number: createPaymentDto.paymentMethod.creditCard.number,
@@ -61,7 +68,7 @@ export class PaymentService {
         return await this.sendPaymentData(
           createPaymentDto,
           clientData,
-          valueTotal,
+          valueTotal.price,
           await payment.json(),
           uuidPayment,
         );
@@ -472,7 +479,7 @@ export class PaymentService {
 
   private async calculateValue(
     createPaymentDto: CreatePaymentDto,
-  ): Promise<number> {
+  ): Promise<{ price: number; value: number }> {
     if (createPaymentDto.service != null) {
       if (typeof createPaymentDto.service == 'number') {
         const serviceData = await this.prisma.service.findUnique({
@@ -491,7 +498,10 @@ export class PaymentService {
           );
         }
 
-        return serviceData.price;
+        return {
+          price: serviceData.price,
+          value: serviceData.price / createPaymentDto.installments ?? 1,
+        };
       } else {
         let servicesLocal = [];
         let total = 0;
@@ -520,7 +530,10 @@ export class PaymentService {
           total += x.price;
         });
 
-        return total;
+        return {
+          price: total,
+          value: total / createPaymentDto.installments ?? 1,
+        };
       }
     } else if (createPaymentDto.package != null) {
       const packageData = await this.prisma.packages.findFirst({
@@ -529,7 +542,10 @@ export class PaymentService {
         },
       });
 
-      return packageData.price;
+      return {
+        price: packageData.price,
+        value: packageData.price / createPaymentDto.installments ?? 1,
+      };
     } else {
       throw new HttpException(
         {

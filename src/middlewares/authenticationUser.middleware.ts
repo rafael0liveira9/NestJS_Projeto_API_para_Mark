@@ -24,9 +24,11 @@ export class AutheticationUserMiddleware implements NestMiddleware {
         token: req.headers.authorization,
       });
 
+      console.log();
+
       const userData = await this.prisma.user.findUnique({
         where: {
-          id: req.userId,
+          id: jwtData.userId,
         },
       });
 
@@ -39,6 +41,7 @@ export class AutheticationUserMiddleware implements NestMiddleware {
         throw Error('Usuário sem Permissão');
       }
     } catch (error) {
+      console.log(error);
       throw new HttpException(
         {
           Code: HttpStatus.UNAUTHORIZED,

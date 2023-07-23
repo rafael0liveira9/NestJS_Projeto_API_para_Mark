@@ -41,12 +41,16 @@ export class AsaasService {
     description,
     externalReference,
     userInfo,
+    installments,
+    valueInstall,
   }: {
     costumer?: string;
     dueDate: string;
     value: number;
     description: string;
     externalReference: string;
+    installments: number;
+    valueInstall: number;
     creditCard: {
       holderName: string;
       number: string;
@@ -63,7 +67,11 @@ export class AsaasService {
       phoneNumber: string;
     };
   }): Promise<Response> {
-    console.log(externalReference, userInfo);
+    /* 
+    "installmentCount": 5,
+  "installmentValue": 20,
+    
+    */
     try {
       const data = await fetch(`${process.env.ASAAS_URL}/api/v3/payments`, {
         method: 'POST',
@@ -77,6 +85,8 @@ export class AsaasService {
           value: value,
           description: description,
           externalReference: externalReference,
+          installmentCount: installments,
+          installmentValue: valueInstall,
           creditCard: {
             holderName: creditCard.holderName,
             number: creditCard.number,

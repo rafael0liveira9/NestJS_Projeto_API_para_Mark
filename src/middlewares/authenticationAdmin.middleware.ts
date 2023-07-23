@@ -26,7 +26,7 @@ export class AuthenticationAdminMiddleware implements NestMiddleware {
 
       const userData = await this.prisma.user.findUnique({
         where: {
-          id: req.userId,
+          id: jwtData.userId,
         },
       });
 

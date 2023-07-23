@@ -12,4 +12,6 @@ export class CreatePaymentDto {
   service?: number | number[];
   @ApiProperty()
   paymentMethod: CreditCardDto;
+  @ApiProperty()
+  installments?: number | 1;
 }
