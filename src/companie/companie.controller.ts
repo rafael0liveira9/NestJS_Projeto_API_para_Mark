@@ -11,6 +11,7 @@ import {
 import { CompanieService } from './companie.service';
 import { CreateCompanieDto } from './dto/create-companie.dto';
 import { UpdateCompanieDto } from './dto/update-companie.dto';
+import { ChangeCompanieDto } from './dto/change-companie.dto';
 
 @Controller('companie')
 export class CompanieController {
@@ -24,6 +25,16 @@ export class CompanieController {
   @Get()
   findAll() {
     return this.companieService.findAll();
+  }
+
+  @Get('me')
+  findMy(@Req() req) {
+    return this.companieService.findMy(req);
+  }
+
+  @Post('change-active')
+  changeCompanie(@Body() changeCompanie: ChangeCompanieDto, @Req() req) {
+    return this.companieService.activeCompany(changeCompanie, req);
   }
 
   @Get(':id')

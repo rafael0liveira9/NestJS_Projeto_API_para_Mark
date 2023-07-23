@@ -111,11 +111,54 @@ export class PackagesService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} package`;
+    return this.prisma.packages.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        PackagesServices: {
+          include: {
+            Service: {
+              include: {
+                ServiceType: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
-  update(id: number, updatePackageDto: UpdatePackageDto) {
-    return `This action updates a #${id} package`;
+  async update(updatePackageDto: UpdatePackageDto) {
+    return await this.prisma.packages.update({
+      where: {
+        id: updatePackageDto.id,
+      },
+      data: {
+        price: updatePackageDto.price,
+        name: updatePackageDto.name,
+        description: updatePackageDto.description,
+        dueDate: updatePackageDto.dueDate
+          ? new Date(Date.parse(updatePackageDto.dueDate))
+          : null,
+        PackagesServices: {
+          connectOrCreate: updatePackageDto.servicesUp.map((x) => {
+            let idData = {};
+
+            if (x.id) {
+              idData = { id: x.id };
+            }
+
+            return {
+              where: idData,
+              create: {
+                serviceId: x.service,
+              },
+            };
+          }),
+        },
+      },
+    });
   }
 
   async remove(id: number) {

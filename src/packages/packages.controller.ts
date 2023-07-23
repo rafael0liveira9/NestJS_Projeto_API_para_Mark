@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { PackagesService } from './packages.service';
 import { CreatePackageDto, PackagesSearch } from './dto/create-package.dto';
@@ -29,6 +30,16 @@ export class PackagesController {
   @Post('/search')
   findOne(@Body() packagesSearch: PackagesSearch) {
     return this.packagesService.findByValues(packagesSearch);
+  }
+
+  @Put('')
+  updatePackage(@Body() UpdatePackageDto: UpdatePackageDto) {
+    return this.packagesService.update(UpdatePackageDto);
+  }
+
+  @Get(':id')
+  getService(@Param('id') id: string) {
+    return this.packagesService.findOne(+id);
   }
 
   @Delete(':id')

@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable, Req } from '@nestjs/common';
 import { CreateCompanieDto } from './dto/create-companie.dto';
 import { UpdateCompanieDto } from './dto/update-companie.dto';
 import { PrismaService } from 'src/singleServices/prisma.service';
+import { ChangeCompanieDto } from './dto/change-companie.dto';
 
 @Injectable()
 export class CompanieService {
@@ -23,6 +24,11 @@ export class CompanieService {
             documentType: createCompanieDto.documentType,
             updatedAt: new Date(),
             Client: {
+              connect: {
+                id: req.id,
+              },
+            },
+            Owner: {
               connect: {
                 id: req.id,
               },
@@ -51,6 +57,100 @@ export class CompanieService {
         },
         HttpStatus.FORBIDDEN,
       );
+    }
+  }
+
+  async findMy(@Req() req) {
+    const userData = await this.prisma.client.findUnique({
+      where: {
+        userId: req.id,
+      },
+    });
+
+    if (!userData)
+      throw new HttpException(
+        {
+          Code: HttpStatus.NOT_FOUND,
+          Message: 'Nenhum dado encontrado',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+
+    if (userData) {
+      try {
+        const companies = await this.prisma.companies.findMany({
+          where: {
+            ownerId: userData.id,
+          },
+        });
+
+        return companies;
+      } catch (error) {
+        throw new HttpException(
+          {
+            Code: HttpStatus.NOT_FOUND,
+            Message: 'Nenhum dado encontrado',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+    }
+  }
+
+  async activeCompany(changeCompanie: ChangeCompanieDto, @Req() req) {
+    const userData = await this.prisma.client.findUnique({
+      where: {
+        userId: req.id,
+      },
+    });
+
+    const companieData = await this.prisma.companies.findFirst({
+      where: {
+        id: changeCompanie.companieId,
+        ownerId: userData.id,
+      },
+    });
+
+    if (!userData)
+      throw new HttpException(
+        {
+          Code: HttpStatus.NOT_FOUND,
+          Message: 'Nenhum dado encontrado',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+
+    if (userData) {
+      if (companieData) {
+        try {
+          const clientData = await this.prisma.client.update({
+            where: {
+              id: userData.id,
+            },
+            data: {
+              companiesId: changeCompanie.companieId,
+            },
+          });
+
+          return clientData;
+        } catch (error) {
+          throw new HttpException(
+            {
+              Code: HttpStatus.BAD_REQUEST,
+              Message: 'Não foi possível concluir a mudança',
+            },
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      } else {
+        throw new HttpException(
+          {
+            Code: HttpStatus.NOT_FOUND,
+            Message: 'Empresa não cadastrada',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
     }
   }
 

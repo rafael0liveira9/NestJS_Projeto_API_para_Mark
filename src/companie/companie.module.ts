@@ -16,6 +16,10 @@ export class CompanieModule {
       .apply(AuthenticationAdminMiddleware)
       .forRoutes({ path: '/companie', method: RequestMethod.GET })
       .apply(AutheticationUserMiddleware)
-      .forRoutes({ path: '/companie', method: RequestMethod.POST });
+      .forRoutes(
+        { path: '/companie', method: RequestMethod.POST },
+        { path: '/companie/me', method: RequestMethod.GET },
+        { path: '/companie/change-active', method: RequestMethod.POST },
+      );
   }
 }

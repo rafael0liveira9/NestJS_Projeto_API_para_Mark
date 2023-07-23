@@ -39,9 +39,12 @@ model Client {
   userId           Int
   User             User               @relation(fields: [userId], references: [id])
   companiesId      Int?
-  Companie         Companies?         @relation(fields: [companiesId], references: [id])
+  Companie         Companies?         @relation(name: "companie", fields: [companiesId], references: [id])
   Payments         Payments[]
   PaymentsServices PaymentsServices[]
+  Companies        Companies[]        @relation(name: "owner")
+
+  @@unique([userId])
 }
 
 model Companies {
@@ -55,7 +58,9 @@ model Companies {
   ContratedService ContratedService[]
   Payments         Payments[]
   PaymentsServices PaymentsServices[]
-  Client           Client[]
+  ownerId          Int?
+  Owner            Client?            @relation(name: "owner", fields: [ownerId], references: [id])
+  Client           Client[]           @relation(name: "companie")
 }
 
 model ContratedService {
