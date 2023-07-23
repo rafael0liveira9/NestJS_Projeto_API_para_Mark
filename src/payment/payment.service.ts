@@ -131,7 +131,6 @@ export class PaymentService {
                     SiteService: {
                       create: {
                         serviceTypeId: 1,
-                        status: 'BRIEFING',
                         updatedAt: new Date(),
                       },
                     },
@@ -145,7 +144,6 @@ export class PaymentService {
                     SiteService: {
                       create: {
                         serviceTypeId: 1,
-                        status: 'BRIEFING',
                         updatedAt: new Date(),
                       },
                     },
@@ -172,7 +170,7 @@ export class PaymentService {
                     LogoService: {
                       create: {
                         serviceTypeId: 2,
-                        status: 'BRIEFING',
+
                         updatedAt: new Date(),
                       },
                     },
@@ -186,7 +184,7 @@ export class PaymentService {
                     LogoService: {
                       create: {
                         serviceTypeId: 2,
-                        status: 'BRIEFING',
+
                         updatedAt: new Date(),
                       },
                     },
@@ -213,7 +211,7 @@ export class PaymentService {
                     SocialService: {
                       create: {
                         serviceTypeId: 3,
-                        status: 'BRIEFING',
+
                         updatedAt: new Date(),
                       },
                     },
@@ -227,7 +225,7 @@ export class PaymentService {
                     SocialService: {
                       create: {
                         serviceTypeId: 3,
-                        status: 'BRIEFING',
+
                         updatedAt: new Date(),
                       },
                     },
@@ -284,7 +282,6 @@ export class PaymentService {
                         SiteService: {
                           create: {
                             serviceTypeId: number;
-                            status: 'BRIEFING';
                             updatedAt: any;
                           };
                         };
@@ -292,7 +289,7 @@ export class PaymentService {
                         SiteService: {
                           create: {
                             serviceTypeId: 1,
-                            status: 'BRIEFING',
+
                             updatedAt: new Date(),
                           },
                         },
@@ -309,7 +306,6 @@ export class PaymentService {
                         SocialService: {
                           create: {
                             serviceTypeId: number;
-                            status: 'BRIEFING';
                             updatedAt: any;
                           };
                         };
@@ -317,7 +313,7 @@ export class PaymentService {
                         SocialService: {
                           create: {
                             serviceTypeId: 3,
-                            status: 'BRIEFING',
+
                             updatedAt: new Date(),
                           },
                         },
@@ -334,7 +330,6 @@ export class PaymentService {
                         LogoService: {
                           create: {
                             serviceTypeId: number;
-                            status: 'BRIEFING';
                             updatedAt: any;
                           };
                         };
@@ -342,7 +337,7 @@ export class PaymentService {
                         LogoService: {
                           create: {
                             serviceTypeId: 2,
-                            status: 'BRIEFING',
+
                             updatedAt: new Date(),
                           },
                         },
@@ -362,7 +357,6 @@ export class PaymentService {
                         SiteService: {
                           create: {
                             serviceTypeId: number;
-                            status: 'BRIEFING';
                             updatedAt: any;
                           };
                         };
@@ -370,7 +364,6 @@ export class PaymentService {
                         SiteService: {
                           create: {
                             serviceTypeId: 1,
-                            status: 'BRIEFING',
                             updatedAt: new Date(),
                           },
                         },
@@ -387,7 +380,6 @@ export class PaymentService {
                         SocialService: {
                           create: {
                             serviceTypeId: number;
-                            status: 'BRIEFING';
                             updatedAt: any;
                           };
                         };
@@ -395,7 +387,6 @@ export class PaymentService {
                         SocialService: {
                           create: {
                             serviceTypeId: 3,
-                            status: 'BRIEFING',
                             updatedAt: new Date(),
                           },
                         },
@@ -412,7 +403,6 @@ export class PaymentService {
                         LogoService: {
                           create: {
                             serviceTypeId: number;
-                            status: 'BRIEFING';
                             updatedAt: any;
                           };
                         };
@@ -420,7 +410,6 @@ export class PaymentService {
                         LogoService: {
                           create: {
                             serviceTypeId: 2,
-                            status: 'BRIEFING',
                             updatedAt: new Date(),
                           },
                         },

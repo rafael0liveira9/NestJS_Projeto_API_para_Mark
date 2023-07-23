@@ -74,6 +74,8 @@ export class AuthService {
           },
         });
 
+        await this.prisma.$disconnect();
+
         return {
           ...clientData,
           jwt: this.jwt.signJwt({
@@ -83,6 +85,7 @@ export class AuthService {
           }),
         };
       } else {
+        await this.prisma.$disconnect();
         throw new HttpException(
           {
             Code: HttpStatus.CONFLICT,
@@ -92,7 +95,7 @@ export class AuthService {
         );
       }
     } catch (error) {
-      console.log(error);
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -142,6 +145,8 @@ export class AuthService {
           },
         });
 
+        await this.prisma.$disconnect();
+
         return {
           ...employeeData,
           jwt: this.jwt.signJwt({
@@ -151,6 +156,8 @@ export class AuthService {
           }),
         };
       } else {
+        await this.prisma.$disconnect();
+
         return {
           Message: params.isAdmin
             ? 'Admin Já existe, tente outro email'
@@ -159,7 +166,7 @@ export class AuthService {
         };
       }
     } catch (error) {
-      console.log(error);
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.FORBIDDEN,
@@ -201,6 +208,7 @@ export class AuthService {
             userExist.User.password,
           );
           if (!result) {
+            await this.prisma.$disconnect();
             throw new HttpException(
               {
                 Code: HttpStatus.CONFLICT,
@@ -237,6 +245,7 @@ export class AuthService {
             return { ...userExistData, jwt: token };
           }
         } else {
+          await this.prisma.$disconnect();
           throw new HttpException(
             {
               Code: HttpStatus.CONFLICT,
@@ -273,6 +282,7 @@ export class AuthService {
               userSecond.User.password,
             );
             if (!result) {
+              await this.prisma.$disconnect();
               throw new HttpException(
                 {
                   Code: HttpStatus.CONFLICT,
@@ -305,12 +315,14 @@ export class AuthService {
                   },
                 },
               });
+              await this.prisma.$disconnect();
               return {
                 ...userSecondData,
                 jwt: token,
               };
             }
           } else {
+            await this.prisma.$disconnect();
             throw new HttpException(
               {
                 Code: HttpStatus.CONFLICT,
@@ -320,6 +332,7 @@ export class AuthService {
             );
           }
         } else {
+          await this.prisma.$disconnect();
           throw new HttpException(
             {
               Code: HttpStatus.CONFLICT,
@@ -330,6 +343,7 @@ export class AuthService {
         }
       }
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,

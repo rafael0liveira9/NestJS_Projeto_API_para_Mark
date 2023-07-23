@@ -12,7 +12,6 @@ export class BriefingService {
   constructor(private prisma: PrismaService) {}
 
   async createLogo(createBriefingDto: CreateBriefingLogoDto) {
-    console.log(createBriefingDto);
     try {
       const data = await this.prisma.contratedService.findFirst({
         where: {
@@ -42,7 +41,7 @@ export class BriefingService {
             id: createBriefingDto.id,
           },
           data: {
-            status: 'CRIACAO',
+            status: 2,
             LogoBriefing: {
               upsert: {
                 create: {
@@ -67,16 +66,9 @@ export class BriefingService {
         });
         return serviceBriefing;
       } else {
-        throw new HttpException(
-          {
-            Code: HttpStatus.NOT_FOUND,
-            Message: 'Nenhum serviço encontrado.',
-          },
-          HttpStatus.NOT_FOUND,
-        );
+        throw Error('Nenhum serviço encontrado.');
       }
     } catch (error) {
-      console.log(error);
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -116,7 +108,7 @@ export class BriefingService {
             id: createBriefingDto.id,
           },
           data: {
-            status: 'PLANEJAMENTO',
+            status: 2,
             SiteBriefing: {
               upsert: {
                 create: {
@@ -190,7 +182,7 @@ export class BriefingService {
             id: createBriefingDto.id,
           },
           data: {
-            status: 'PLANEJAMENTO',
+            status: 2,
             SocialBriefing: {
               create: {
                 networkType: createBriefingDto.network,

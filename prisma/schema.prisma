@@ -36,15 +36,13 @@ model Client {
   costumerId       String
   createdAt        DateTime           @default(now())
   updatedAt        DateTime?
-  userId           Int
-  User             User               @relation(fields: [userId], references: [id])
+  userId           Int                @unique
   companiesId      Int?
-  Companie         Companies?         @relation(name: "companie", fields: [companiesId], references: [id])
+  Companie         Companies?         @relation("companie", fields: [companiesId], references: [id])
+  User             User               @relation(fields: [userId], references: [id])
+  Companies        Companies[]        @relation("owner")
   Payments         Payments[]
   PaymentsServices PaymentsServices[]
-  Companies        Companies[]        @relation(name: "owner")
-
-  @@unique([userId])
 }
 
 model Companies {
@@ -54,13 +52,13 @@ model Companies {
   documentType     String
   createdAt        DateTime           @default(now())
   updatedAt        DateTime?
+  ownerId          Int?
   Cards            Cards[]
+  Client           Client[]           @relation("companie")
+  Owner            Client?            @relation("owner", fields: [ownerId], references: [id])
   ContratedService ContratedService[]
   Payments         Payments[]
   PaymentsServices PaymentsServices[]
-  ownerId          Int?
-  Owner            Client?            @relation(name: "owner", fields: [ownerId], references: [id])
-  Client           Client[]           @relation(name: "companie")
 }
 
 model ContratedService {
@@ -102,13 +100,13 @@ model Images {
   author             String
   createdAt          DateTime             @default(now())
   updatedAt          DateTime?
-  SocialFeedShow     SocialFeedShow[]
+  LogoArchives       LogoArchives[]
   SiteProof          LogoProof[]
   SiteProofMockups   LogoProofMockups[]
-  LogoArchives       LogoArchives[]
-  SiteLayoutsBase    SiteLayoutsBase[]
-  SiteLayoutSelected SiteLayoutSelected[]
   SiteLayoutFinished SiteLayoutFinished[]
+  SiteLayoutSelected SiteLayoutSelected[]
+  SiteLayoutsBase    SiteLayoutsBase[]
+  SocialFeedShow     SocialFeedShow[]
 }
 
 model Lead {
@@ -129,9 +127,9 @@ model LogoBriefing {
   especification EspecificationTypes
   description    String?
   references     String?
+  titlefirst     String?
+  titlesecond    String?
   LogoService    LogoService[]
-
-  // @@index([id])
 }
 
 model LogoContratedItems {
@@ -144,21 +142,21 @@ model LogoContratedItems {
 
 model LogoService {
   id                 Int                  @id @default(autoincrement())
-  status             LogoStatus
+  status             Int                  @default(1)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime?
   dueDate            DateTime?
-  feedbackSended     Boolean?             @default(false)
   serviceTypeId      Int?                 @default(3)
   logoBriefingId     Int?
   logoProofId        Int?
-  LogoBriefing       LogoBriefing?        @relation(fields: [logoBriefingId], references: [id])
-  LogoContratedItems LogoContratedItems[]
-  ServiceType        ServiceType?         @relation(fields: [serviceTypeId], references: [id])
-  LogoProof          LogoProof?           @relation(fields: [logoProofId], references: [id])
+  feedbackSended     Boolean?             @default(false)
   logoFeedbackId     Int?
-  LogoFeedback       LogoFeedback?        @relation(fields: [logoFeedbackId], references: [id])
   LogoArchives       LogoArchives[]
+  LogoContratedItems LogoContratedItems[]
+  LogoBriefing       LogoBriefing?        @relation(fields: [logoBriefingId], references: [id])
+  LogoFeedback       LogoFeedback?        @relation(fields: [logoFeedbackId], references: [id])
+  LogoProof          LogoProof?           @relation(fields: [logoProofId], references: [id])
+  ServiceType        ServiceType?         @relation(fields: [serviceTypeId], references: [id])
 }
 
 model LogoFeedback {
@@ -176,19 +174,19 @@ model LogoArchives {
   type          String
   url           String
   previewId     Int
-  preview       Images       @relation(fields: [previewId], references: [id])
   createdAt     DateTime     @default(now())
   updatedAt     DateTime?
   logoServiceId Int?
   LogoService   LogoService? @relation(fields: [logoServiceId], references: [id])
+  preview       Images       @relation(fields: [previewId], references: [id])
 }
 
 model LogoProof {
   id           Int                @id @default(autoincrement())
   isApproved   Boolean?
-  userSended   Boolean?
   reasonRefuse String?
   imagesId     Int
+  userSended   Boolean?
   proofImage   Images             @relation(fields: [imagesId], references: [id])
   Mockups      LogoProofMockups[]
   LogoService  LogoService[]
@@ -197,8 +195,8 @@ model LogoProof {
 model LogoProofMockups {
   id          Int        @id @default(autoincrement())
   imagesId    Int
-  image       Images     @relation(fields: [imagesId], references: [id])
   logoProofId Int?
+  image       Images     @relation(fields: [imagesId], references: [id])
   LogoProof   LogoProof? @relation(fields: [logoProofId], references: [id])
 }
 
@@ -209,8 +207,8 @@ model Packages {
   description      String
   createdAt        DateTime           @default(now())
   updatedAt        DateTime?
-  deletedAt        DateTime?
   dueDate          DateTime?
+  deletedAt        DateTime?
   PackagesServices PackagesServices[]
   PaymentsServices PaymentsServices[]
 }
@@ -225,17 +223,16 @@ model PackagesServices {
 
 model Payments {
   id               Int                @id @default(autoincrement())
-  uuid             String             @unique
   clientId         Int
   companiesId      Int
   value            Float
   discount         Float?
-  //Alterar voucher id junto do schema/model junto ao banco
   voucherId        Int?
   status           PaymentStatus
   logGateway       Json
   createdAt        DateTime           @default(now())
   updatedAt        DateTime?
+  uuid             String             @unique
   Client           Client             @relation(fields: [clientId], references: [id])
   Companies        Companies          @relation(fields: [companiesId], references: [id])
   PaymentsServices PaymentsServices[]
@@ -247,13 +244,13 @@ model PaymentsServices {
   serviceId   Int?
   clientId    Int
   companiesId Int
-  packagesId  Int?
   createdAt   DateTime  @default(now())
+  packagesId  Int?
   Client      Client    @relation(fields: [clientId], references: [id])
-  Payment     Payments  @relation(fields: [paymentsId], references: [id])
-  Service     Service?  @relation(fields: [serviceId], references: [id])
   Companies   Companies @relation(fields: [companiesId], references: [id])
   Package     Packages? @relation(fields: [packagesId], references: [id])
+  Payment     Payments  @relation(fields: [paymentsId], references: [id])
+  Service     Service?  @relation(fields: [serviceId], references: [id])
 }
 
 model RoleType {
@@ -269,11 +266,11 @@ model Service {
   description      String
   createdAt        DateTime           @default(now())
   updatedAt        DateTime?
-  deletedAt        DateTime?
   serviceTypeId    Int
+  deletedAt        DateTime?
   PackagesServices PackagesServices[]
-  ServiceType      ServiceType        @relation(fields: [serviceTypeId], references: [id])
   PaymentsServices PaymentsServices[]
+  ServiceType      ServiceType        @relation(fields: [serviceTypeId], references: [id])
 }
 
 model ServiceType {
@@ -294,8 +291,6 @@ model SiteBriefing {
   contactData String?
   socialMidia String?
   SiteService SiteService[]
-
-  // @@index([id])
 }
 
 model SiteContratedItems {
@@ -308,29 +303,29 @@ model SiteContratedItems {
 
 model SiteService {
   id                   Int                  @id @default(autoincrement())
-  status               SiteStatus
+  status               Int                  @default(1)
   createdAt            DateTime             @default(now())
   updatedAt            DateTime?
   dueDate              DateTime?
-  isPublished          Boolean?
   serviceTypeId        Int?                 @default(1)
-  SiteBriefing         SiteBriefing?        @relation(fields: [siteBriefingId], references: [id])
-  SiteContratedItems   SiteContratedItems[]
-  ServiceType          ServiceType?         @relation(fields: [serviceTypeId], references: [id])
   siteBriefingId       Int?
-  SiteLayoutBase       SiteLayoutsBase[]
-  siteLayoutSelectedId Int?
-  SiteLayoutSelected   SiteLayoutSelected?  @relation(fields: [siteLayoutSelectedId], references: [id])
   siteLayoutFinishedId Int?
+  siteLayoutSelectedId Int?
+  isPublished          Boolean?
+  SiteContratedItems   SiteContratedItems[]
+  SiteLayoutBase       SiteLayoutsBase[]
+  ServiceType          ServiceType?         @relation(fields: [serviceTypeId], references: [id])
+  SiteBriefing         SiteBriefing?        @relation(fields: [siteBriefingId], references: [id])
   SiteLayoutFinished   SiteLayoutFinished?  @relation(fields: [siteLayoutFinishedId], references: [id])
+  SiteLayoutSelected   SiteLayoutSelected?  @relation(fields: [siteLayoutSelectedId], references: [id])
 }
 
 model SiteLayoutsBase {
   id            Int          @id @default(autoincrement())
   name          String
   layoutId      Int
-  Layout        Images       @relation(fields: [layoutId], references: [id])
   siteServiceId Int?
+  Layout        Images       @relation(fields: [layoutId], references: [id])
   SiteService   SiteService? @relation(fields: [siteServiceId], references: [id])
 }
 
@@ -344,8 +339,8 @@ model SiteLayoutSelected {
 model SiteLayoutFinished {
   id            Int           @id @default(autoincrement())
   isApproved    Boolean?
-  refuseReason  String?
   layoutId      Int?
+  refuseReason  String?
   LayoutFinshed Images?       @relation(fields: [layoutId], references: [id])
   SiteService   SiteService[]
 }
@@ -359,8 +354,6 @@ model SocialBriefing {
   daysHours     String
   mediaFormat   MediaFormat
   SocialService SocialService[]
-
-  // @@index([id])
 }
 
 model SocialContratedItems {
@@ -373,27 +366,27 @@ model SocialContratedItems {
 
 model SocialService {
   id                   Int                    @id @default(autoincrement())
-  status               SocialStatus
+  status               Int                    @default(1)
   createdAt            DateTime               @default(now())
   updatedAt            DateTime?
   dueDate              DateTime?
   serviceTypeId        Int?                   @default(2)
-  socialShowId         Int?
   socialBriefingId     Int?
-  SocialShow           SocialShow?            @relation(fields: [socialShowId], references: [id])
-  SocialBriefing       SocialBriefing?        @relation(fields: [socialBriefingId], references: [id])
+  socialShowId         Int?
   SocialContratedItems SocialContratedItems[]
   ServiceType          ServiceType?           @relation(fields: [serviceTypeId], references: [id])
+  SocialBriefing       SocialBriefing?        @relation(fields: [socialBriefingId], references: [id])
+  SocialShow           SocialShow?            @relation(fields: [socialShowId], references: [id])
 }
 
 model SocialShow {
   id               Int              @id @default(autoincrement())
   allApproved      Boolean?
-  isSendedByClient Boolean?
-  isRefused        Boolean          @default(false)
-  feed             SocialFeedShow[]
   createdAt        DateTime         @default(now())
   updatedAt        DateTime?
+  isRefused        Boolean          @default(false)
+  isSendedByClient Boolean?
+  feed             SocialFeedShow[]
   SocialService    SocialService[]
 }
 
@@ -401,12 +394,12 @@ model SocialFeedShow {
   id           Int                @id @default(autoincrement())
   text         String
   type         SocialFeedShowType
-  imagesId     Int?
-  socialShowId Int?
   approved     Boolean?
   reasonRefuse String?
-  SocialShow   SocialShow?        @relation(fields: [socialShowId], references: [id])
+  socialShowId Int?
+  imagesId     Int?
   Images       Images?            @relation(fields: [imagesId], references: [id])
+  SocialShow   SocialShow?        @relation(fields: [socialShowId], references: [id])
 }
 
 model Tables {
@@ -426,8 +419,8 @@ model User {
   deletedAt     DateTime?
   notification  Boolean    @default(true)
   firebaseToken String
-  roleTypeId    Int        @default(3)
-  Client        Client[]
+  roleTypeId    Int        @default(1)
+  Client        Client?
   Employee      Employee[]
   Errors        Errors[]
   RoleType      RoleType   @relation(fields: [roleTypeId], references: [id])
@@ -445,14 +438,6 @@ enum FormatStyles {
   RETANGULAR_HORIZONTAL
   RETANGULAR_VERTICAL
   NONE
-}
-
-enum LogoStatus {
-  BRIEFING
-  CRIACAO
-  PROVAS
-  AVALIACAO
-  CONCLUSAO
 }
 
 enum MediaFormat {
@@ -483,15 +468,6 @@ enum SiteModels {
   NONE
 }
 
-enum SiteStatus {
-  BRIEFING
-  PLANEJAMENTO
-  DEFINICAO
-  AMOSTRA
-  APRESENTACAO
-  PUBLICACAO
-}
-
 enum SocialImageBase {
   BANCO
   CLIENTE
@@ -510,15 +486,6 @@ enum SocialServiceTypes {
   PLANEJAMENTO_VISUAL
   PLANEJAMENTO_POSTAGENS
   PLANEJAMENTO_GESTAO
-}
-
-enum SocialStatus {
-  BRIEFING
-  PLANEJAMENTO
-  AMOSTRA
-  CRIACAO
-  APROVACAO
-  FINALIZADO
 }
 
 enum SocialFeedShowType {

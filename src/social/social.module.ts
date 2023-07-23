@@ -17,6 +17,9 @@ export class SocialModule {
       .forRoutes(
         { path: '/social/to-show', method: RequestMethod.POST },
         { path: '/social/to-approve', method: RequestMethod.POST },
+        { path: '/social/to-plan', method: RequestMethod.POST },
+        { path: '/social/to-pending-publish', method: RequestMethod.POST },
+        { path: '/social/to-publish', method: RequestMethod.POST },
       )
       .apply(AutheticationUserMiddleware)
       .forRoutes(

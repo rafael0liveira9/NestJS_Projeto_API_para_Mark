@@ -18,7 +18,7 @@ export class LogoService {
       },
     });
 
-    if (logoService.status != 'CRIACAO') {
+    if (logoService.status != 3) {
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -34,7 +34,7 @@ export class LogoService {
           id: createLogoDto.id,
         },
         data: {
-          status: 'PROVAS',
+          status: 4,
           LogoProof: {
             create: {
               imagesId: createLogoDto.proof,
@@ -47,6 +47,9 @@ export class LogoService {
           },
         },
       });
+
+      await this.prisma.$disconnect();
+
       return itemData;
     } catch (error) {
       throw new HttpException(
@@ -66,9 +69,13 @@ export class LogoService {
       },
     });
 
-    console.log(updateLogo);
+    const userData = await this.prisma.user.findUnique({
+      where: {
+        id: req.userId,
+      },
+    });
 
-    if (logoService.status == 'AVALIACAO') {
+    if (logoService.status < 4 || logoService.status > 5) {
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -77,8 +84,6 @@ export class LogoService {
         HttpStatus.CONFLICT,
       );
     }
-
-    console.log(logoService);
 
     let mockups = {},
       imageId = {};
@@ -98,7 +103,7 @@ export class LogoService {
       };
     }
 
-    if (req.roleType == 3 || req.roleType == 2) {
+    if (userData.roleTypeId > 1) {
       imageId = {
         imagesId: updateLogo.proof,
       };
@@ -110,29 +115,22 @@ export class LogoService {
           id: updateLogo.id,
         },
         data: {
-          status:
-            req.roleType == 3 || req.roleType == 2
-              ? 'PROVAS'
-              : updateLogo.isApproved
-              ? 'AVALIACAO'
-              : 'PROVAS',
+          status: userData.roleTypeId > 1 ? 4 : updateLogo.isApproved ? 6 : 5,
           LogoProof: {
             update: {
               ...imageId,
               reasonRefuse:
-                req.roleType == 3 || req.roleType == 2
-                  ? ''
-                  : updateLogo.reasonRefuse,
+                userData.roleTypeId > 1 ? '' : updateLogo.reasonRefuse,
               isApproved:
-                req.roleType == 3 || req.roleType == 2
-                  ? false
-                  : updateLogo.isApproved,
-              userSended: req.roleType == 3 || req.roleType == 2 ? false : true,
+                userData.roleTypeId > 1 ? false : updateLogo.isApproved,
+              userSended: userData.roleTypeId > 1 ? false : true,
               ...mockups,
             },
           },
         },
       });
+
+      await this.prisma.$disconnect();
 
       return upLogo;
     } catch (error) {
@@ -154,18 +152,6 @@ export class LogoService {
       },
     });
 
-    // if (
-    //   logoService.status == 'AVALIACAO'
-    // ) {
-    //   throw new HttpException(
-    //     {
-    //       Code: HttpStatus.CONFLICT,
-    //       Message: `Serviço não pode ser atualizado no momento.`,
-    //     },
-    //     HttpStatus.CONFLICT,
-    //   );
-    // }
-
     try {
       const upLogo = await this.prisma.logoService.update({
         where: {
@@ -182,7 +168,7 @@ export class LogoService {
         },
       });
 
-      this.prisma.$disconnect();
+      await this.prisma.$disconnect();
 
       return upLogo;
     } catch (error) {
@@ -203,7 +189,7 @@ export class LogoService {
       },
     });
 
-    if (logoService.status != 'AVALIACAO') {
+    if (logoService.status < 7) {
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -219,7 +205,7 @@ export class LogoService {
           id: sendArchive.id,
         },
         data: {
-          status: 'CONCLUSAO',
+          status: 8,
           LogoArchives: {
             create: sendArchive.archives.map((x) => ({
               name: x.name,
@@ -231,7 +217,7 @@ export class LogoService {
         },
       });
 
-      this.prisma.$disconnect();
+      await this.prisma.$disconnect();
 
       return upLogo;
     } catch (error) {

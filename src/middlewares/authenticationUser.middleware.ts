@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtService } from '../singleServices/jwt.service';
+import { PrismaService } from 'src/singleServices/prisma.service';
 
 interface RequestAuth extends Request {
   userId: number;
@@ -15,7 +16,7 @@ interface RequestAuth extends Request {
 
 @Injectable()
 export class AutheticationUserMiddleware implements NestMiddleware {
-  constructor(private jwt: JwtService) {}
+  constructor(private jwt: JwtService, private prisma: PrismaService) {}
 
   async use(req: RequestAuth, res: Response, next: Function) {
     try {
@@ -23,27 +24,25 @@ export class AutheticationUserMiddleware implements NestMiddleware {
         token: req.headers.authorization,
       });
 
-      console.log(jwtData);
+      const userData = await this.prisma.user.findUnique({
+        where: {
+          id: req.userId,
+        },
+      });
 
-      if (jwtData.roleType <= 3) {
-        req.userId = jwtData.userId;
+      if (userData.roleTypeId <= 3) {
+        req.userId = userData.id;
         req.id = jwtData.id;
-        req.roleType = jwtData.roleType;
+        req.roleType = userData.roleTypeId;
         next();
       } else {
-        throw new HttpException(
-          {
-            Code: HttpStatus.UNAUTHORIZED,
-            Message: 'Usuário sem Permissão',
-          },
-          HttpStatus.UNAUTHORIZED,
-        );
+        throw Error('Usuário sem Permissão');
       }
     } catch (error) {
       throw new HttpException(
         {
           Code: HttpStatus.UNAUTHORIZED,
-          Message: 'Usuário sem Permissão',
+          Message: error.message ?? 'Usuário sem Permissão',
         },
         HttpStatus.UNAUTHORIZED,
       );

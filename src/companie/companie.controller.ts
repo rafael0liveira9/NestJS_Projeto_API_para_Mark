@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Req,
+  HttpCode,
 } from '@nestjs/common';
 import { CompanieService } from './companie.service';
 import { CreateCompanieDto } from './dto/create-companie.dto';
@@ -23,16 +24,19 @@ export class CompanieController {
   }
 
   @Get()
+  @HttpCode(200)
   findAll() {
     return this.companieService.findAll();
   }
 
   @Get('me')
+  @HttpCode(200)
   findMy(@Req() req) {
     return this.companieService.findMy(req);
   }
 
   @Post('change-active')
+  @HttpCode(200)
   changeCompanie(@Body() changeCompanie: ChangeCompanieDto, @Req() req) {
     return this.companieService.activeCompany(changeCompanie, req);
   }

@@ -7,6 +7,95 @@ import { PrismaService } from 'src/singleServices/prisma.service';
 export class SocialService {
   constructor(private prisma: PrismaService) {}
 
+  async updateStatusToStatus(
+    createSocialDto: CreateSocialDto,
+    status: number,
+    verifyNumber: number,
+  ) {
+    const socialServiceStatus = await this.prisma.socialService.findUnique({
+      where: {
+        id: createSocialDto.id,
+      },
+    });
+
+    if (socialServiceStatus.status != verifyNumber)
+      throw new HttpException(
+        {
+          Code: HttpStatus.CONFLICT,
+          Message: `Serviço já atualizado.`,
+        },
+        HttpStatus.CONFLICT,
+      );
+
+    try {
+      const socialService = await this.prisma.socialService.update({
+        where: {
+          id: createSocialDto.id,
+        },
+        data: {
+          status: status,
+        },
+      });
+
+      await this.prisma.$disconnect();
+
+      return socialService;
+    } catch (error) {
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Ocorreu um erro na atualização do serviço`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // async updateStatusToCreation(createSocialDto: CreateSocialDto) {
+  //   const socialService = await this.prisma.socialService.update({
+  //     where: {
+  //       id: createSocialDto.id,
+  //     },
+  //     data: {
+  //       status: 7,
+  //     },
+  //   });
+
+  //   await this.prisma.$disconnect();
+
+  //   return socialService;
+  // }
+
+  // async updateStatusToPendingPublish(createSocialDto: CreateSocialDto) {
+  //   const socialService = await this.prisma.socialService.update({
+  //     where: {
+  //       id: createSocialDto.id,
+  //     },
+  //     data: {
+  //       status: 11,
+  //     },
+  //   });
+
+  //   await this.prisma.$disconnect();
+
+  //   return socialService;
+  // }
+
+  // async updateStatusToPublished(createSocialDto: CreateSocialDto) {
+  //   const socialService = await this.prisma.socialService.update({
+  //     where: {
+  //       id: createSocialDto.id,
+  //     },
+  //     data: {
+  //       status: 12,
+  //     },
+  //   });
+
+  //   await this.prisma.$disconnect();
+
+  //   return socialService;
+  // }
+
   async updateStatusToShow(createSocialDto: CreateSocialDto) {
     const socialServiceStatus = await this.prisma.socialService.findUnique({
       where: {
@@ -16,7 +105,7 @@ export class SocialService {
 
     if (
       socialServiceStatus.socialShowId == null &&
-      socialServiceStatus.status == 'CRIACAO'
+      socialServiceStatus.status == 3
     ) {
       try {
         const socialServiceStatus = await this.prisma.socialService.update({
@@ -24,7 +113,7 @@ export class SocialService {
             id: createSocialDto.id,
           },
           data: {
-            status: 'AMOSTRA',
+            status: 4,
             SocialShow: {
               create: {
                 feed: {
@@ -73,14 +162,14 @@ export class SocialService {
       },
     });
 
-    if (socialServiceStatus.status == 'CRIACAO') {
+    if (socialServiceStatus.status >= 8 && socialServiceStatus.status <= 10) {
       try {
         const socialUpdateSocial = await this.prisma.socialService.update({
           where: {
             id: updateShow.id,
           },
           data: {
-            status: 'APROVACAO',
+            status: 9,
             SocialShow: {
               update: {
                 allApproved: updateShow.allApproved,
@@ -134,13 +223,19 @@ export class SocialService {
   }
 
   async updateShow(updateShow: UpdateSocialShowDto, req) {
+    const userData = await this.prisma.user.findUnique({
+      where: {
+        id: req.userId,
+      },
+    });
+
     const socialServiceStatus = await this.prisma.socialService.findUnique({
       where: {
         id: updateShow.id,
       },
     });
 
-    if (socialServiceStatus.status == 'AMOSTRA') {
+    if (socialServiceStatus.status >= 4 && socialServiceStatus.status < 7) {
       try {
         const socialUpdateService = await this.prisma.socialService.update({
           where: {
@@ -148,21 +243,13 @@ export class SocialService {
           },
           data: {
             status:
-              req.roleType == 3 || req.roleType == 2
-                ? 'CRIACAO'
-                : updateShow.allApproved
-                ? 'CRIACAO'
-                : 'AMOSTRA',
+              userData.roleTypeId > 1 ? 4 : updateShow.allApproved ? 6 : 5,
             SocialShow: {
               update: {
                 allApproved:
-                  req.roleType == 3 || req.roleType == 2
-                    ? false
-                    : updateShow.allApproved,
+                  userData.roleTypeId > 1 ? false : updateShow.allApproved,
                 isRefused:
-                  req.roleType == 3 || req.roleType == 2
-                    ? false
-                    : updateShow.isRefused,
+                  userData.roleTypeId > 1 ? false : updateShow.isRefused,
                 feed: {
                   updateMany: updateShow.feed.map((x) => ({
                     where: {
@@ -172,14 +259,9 @@ export class SocialService {
                       text: x.text,
                       type: x.type,
                       imagesId: x.image,
-                      approved:
-                        req.roleType == 3 || req.roleType == 2
-                          ? false
-                          : x.approved,
+                      approved: userData.roleTypeId > 1 ? false : x.approved,
                       reasonRefuse:
-                        req.roleType == 3 || req.roleType == 2
-                          ? ''
-                          : x.reasonRefuse,
+                        userData.roleTypeId > 1 ? '' : x.reasonRefuse,
                     },
                   })),
                 },
@@ -206,42 +288,44 @@ export class SocialService {
         );
       }
     } else {
-      throw new HttpException(
-        {
-          Code: HttpStatus.CONFLICT,
-          Message: `Serviço já atualizado.`,
-        },
-        HttpStatus.CONFLICT,
-      );
     }
   }
 
   async updateApproveFinal(updateShow: UpdateSocialShowDto, req) {
+    const userData = await this.prisma.user.findUnique({
+      where: {
+        id: req.userId,
+      },
+    });
+
     const socialServiceStatus = await this.prisma.socialService.findUnique({
       where: {
         id: updateShow.id,
       },
     });
 
-    if (socialServiceStatus.status == 'APROVACAO') {
+    if (socialServiceStatus.status >= 7 && socialServiceStatus.status < 11) {
       try {
         const socialUpdateService = await this.prisma.socialService.update({
           where: {
             id: updateShow.id,
           },
           data: {
+            status:
+              socialServiceStatus.status == 7
+                ? 8
+                : userData.roleTypeId > 1
+                ? 8
+                : updateShow.allApproved
+                ? 10
+                : 9,
             SocialShow: {
               update: {
                 allApproved:
-                  req.roleType == 3 || req.roleType == 2
-                    ? false
-                    : updateShow.allApproved,
+                  userData.roleTypeId > 1 ? false : updateShow.allApproved,
                 isRefused:
-                  req.roleType == 3 || req.roleType == 2
-                    ? false
-                    : updateShow.isRefused,
-                isSendedByClient:
-                  req.roleType == 3 || req.roleType == 2 ? false : true,
+                  userData.roleTypeId > 1 ? false : updateShow.isRefused,
+                isSendedByClient: userData.roleTypeId > 1 ? false : true,
                 feed: {
                   updateMany: updateShow.feed.map((x) => ({
                     where: {
@@ -251,14 +335,9 @@ export class SocialService {
                       text: x.text,
                       type: x.type,
                       imagesId: x.image,
-                      approved:
-                        req.roleType == 3 || req.roleType == 2
-                          ? false
-                          : x.approved,
+                      approved: userData.roleTypeId > 1 ? false : x.approved,
                       reasonRefuse:
-                        req.roleType == 3 || req.roleType == 2
-                          ? ''
-                          : x.reasonRefuse,
+                        userData.roleTypeId > 1 ? '' : x.reasonRefuse,
                     },
                   })),
                 },

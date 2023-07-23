@@ -15,7 +15,7 @@ export class SiteService {
       },
     });
 
-    if (service.status != 'PLANEJAMENTO')
+    if (service.status != 3)
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -30,7 +30,7 @@ export class SiteService {
           id: createSiteDto.id,
         },
         data: {
-          status: 'DEFINICAO',
+          status: 4,
           SiteLayoutBase: {
             create: createSiteDto.images.map((x) => ({
               name: x.name,
@@ -39,6 +39,7 @@ export class SiteService {
           },
         },
       });
+
       return serviceData;
     } catch (error) {
       throw new HttpException(
@@ -58,7 +59,7 @@ export class SiteService {
       },
     });
 
-    if (service.status != 'DEFINICAO')
+    if (service.status != 4)
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -73,7 +74,7 @@ export class SiteService {
           id: selectLayout.id,
         },
         data: {
-          status: 'AMOSTRA',
+          status: 5,
           SiteLayoutSelected: {
             create: {
               layoutId: selectLayout.imageId,
@@ -101,7 +102,7 @@ export class SiteService {
       },
     });
 
-    if (service.status != 'AMOSTRA')
+    if (service.status != 5)
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -116,7 +117,7 @@ export class SiteService {
           id: selectLayout.id,
         },
         data: {
-          status: 'APRESENTACAO',
+          status: 6,
         },
       });
 
@@ -139,7 +140,7 @@ export class SiteService {
       },
     });
 
-    if (service.status != 'APRESENTACAO')
+    if (service.status != 6)
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -154,6 +155,7 @@ export class SiteService {
           id: selectLayout.id,
         },
         data: {
+          status: 7,
           SiteLayoutFinished: {
             create: {
               layoutId: selectLayout.imageId,
@@ -180,7 +182,7 @@ export class SiteService {
       },
     });
 
-    if (service.status != 'APRESENTACAO')
+    if (service.status != 6)
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -195,7 +197,7 @@ export class SiteService {
           id: selectLayout.id,
         },
         data: {
-          status: selectLayout.isApproved ? 'PUBLICACAO' : 'APRESENTACAO',
+          status: selectLayout.isApproved ? 7 : 6,
           SiteLayoutFinished: {
             update: {
               isApproved: selectLayout.isApproved,
@@ -225,7 +227,7 @@ export class SiteService {
       },
     });
 
-    if (service.status != 'PUBLICACAO')
+    if (service.status != 7)
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -240,6 +242,7 @@ export class SiteService {
           id: selectLayout.id,
         },
         data: {
+          status: 8,
           isPublished: true,
         },
       });
