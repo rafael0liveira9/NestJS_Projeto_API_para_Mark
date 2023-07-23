@@ -66,8 +66,13 @@ export class PaymentService {
           uuidPayment,
         );
       } catch (error) {
-        console.log(error);
-        return error;
+        throw new HttpException(
+          {
+            Code: HttpStatus.BAD_REQUEST,
+            Message: 'Não foi possível concluir a compra',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       }
     } else {
       throw new HttpException(

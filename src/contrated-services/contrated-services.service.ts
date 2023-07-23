@@ -109,7 +109,7 @@ export class ContratedServicesService {
           },
         });
         this.prisma.$disconnect();
-        return contratedServices;
+        return contratedServices ?? {};
       } catch (error) {
         throw new HttpException(
           {

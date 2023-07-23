@@ -63,7 +63,7 @@ export class CompanieService {
   async findMy(@Req() req) {
     const userData = await this.prisma.client.findUnique({
       where: {
-        userId: req.id,
+        id: req.id,
       },
     });
 
