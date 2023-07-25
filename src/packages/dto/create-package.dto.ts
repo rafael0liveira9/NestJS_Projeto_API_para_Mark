@@ -17,18 +17,9 @@ export class PackagesSearch {
   @ApiProperty()
   value: number;
   @ApiProperty()
-  haveLogo: {
-    isSelected: boolean;
-    needModification: boolean;
-  };
+  haveLogo: boolean;
   @ApiProperty()
-  haveSite: {
-    isSelected: boolean;
-    needModification: boolean;
-  };
+  haveSite: boolean;
   @ApiProperty()
-  haveSocialMidia: {
-    isSelected: boolean;
-    needModification: boolean;
-  };
+  haveSocialMidia: boolean;
 }

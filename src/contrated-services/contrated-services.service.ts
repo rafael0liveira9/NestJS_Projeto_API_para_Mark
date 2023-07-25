@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { CreateContratedServiceDto } from './dto/create-contrated-service.dto';
 import { UpdateContratedServiceDto } from './dto/update-contrated-service.dto';
 import { PrismaService } from 'src/singleServices/prisma.service';
@@ -11,7 +17,7 @@ export class ContratedServicesService {
     return 'This action adds a new contratedService';
   }
 
-  async findAll(req) {
+  async findAll(@Req() req, @Query() query) {
     const userData = await this.prisma.client.findUnique({
       where: {
         id: +req.id,
@@ -38,74 +44,87 @@ export class ContratedServicesService {
             companiesId: userData.Companie.id,
           },
           include: {
-            Companies: true,
-            LogoContratedItems: {
+            Companies: {
               include: {
-                LogoService: {
-                  include: {
-                    LogoArchives: {
-                      include: {
-                        preview: true,
-                      },
-                    },
-                    LogoBriefing: true,
-                    LogoFeedback: true,
-                    LogoProof: {
-                      include: {
-                        proofImage: true,
-                        Mockups: {
-                          include: {
-                            image: true,
+                Owner: true,
+              },
+            },
+            LogoContratedItems:
+              query.logo == 'true' || query.logo == undefined
+                ? {
+                    include: {
+                      LogoService: {
+                        include: {
+                          LogoArchives: {
+                            include: {
+                              preview: true,
+                            },
+                          },
+                          LogoBriefing: true,
+                          LogoFeedback: true,
+                          LogoProof: {
+                            include: {
+                              proofImage: true,
+                              Mockups: {
+                                include: {
+                                  image: true,
+                                },
+                              },
+                            },
                           },
                         },
                       },
                     },
-                  },
-                },
-              },
-            },
-            SiteContratedItems: {
-              include: {
-                SiteService: {
-                  include: {
-                    SiteBriefing: true,
-                    SiteLayoutBase: {
-                      include: {
-                        Layout: true,
-                      },
-                    },
-                    SiteLayoutFinished: {
-                      include: {
-                        LayoutFinshed: true,
-                      },
-                    },
-                    SiteLayoutSelected: {
-                      include: {
-                        LayoutSelected: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            SocialContratedItems: {
-              include: {
-                SocialService: {
-                  include: {
-                    SocialBriefing: true,
-                    SocialShow: {
-                      include: {
-                        feed: {
-                          include: {
-                            Images: true,
+                  }
+                : false,
+            SiteContratedItems:
+              query.site == 'true' || query.site == undefined
+                ? {
+                    include: {
+                      SiteService: {
+                        include: {
+                          SiteBriefing: true,
+                          SiteLayoutBase: {
+                            include: {
+                              Layout: true,
+                            },
+                          },
+                          SiteLayoutFinished: {
+                            include: {
+                              LayoutFinshed: true,
+                            },
+                          },
+                          SiteLayoutSelected: {
+                            include: {
+                              LayoutSelected: true,
+                            },
                           },
                         },
                       },
                     },
-                  },
-                },
-              },
-            },
+                  }
+                : false,
+            SocialContratedItems:
+              query.social == 'true' || query.social == undefined
+                ? {
+                    include: {
+                      SocialService: {
+                        include: {
+                          SocialBriefing: true,
+                          SocialShow: {
+                            include: {
+                              feed: {
+                                include: {
+                                  Images: true,
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  }
+                : false,
           },
         });
         this.prisma.$disconnect();

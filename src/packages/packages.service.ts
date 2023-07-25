@@ -61,32 +61,15 @@ export class PackagesService {
       },
     });
 
-    if (packageSearch.value != null) {
-      data = data.filter(
-        (x) =>
-          x.price <= packageSearch.value + (packageSearch.value / 100) * 10 &&
-          x,
-      );
-    }
-
-    if (
-      (packageSearch.haveLogo.isSelected == true &&
-        packageSearch.haveLogo.needModification == true) ||
-      (packageSearch.haveLogo.isSelected == false &&
-        packageSearch.haveLogo.needModification == false)
-    ) {
+    if (packageSearch.haveLogo == true) {
       data = data.filter((x) => {
-        if (x.PackagesServices.some((y) => y.Service.serviceTypeId == 3)) {
+        if (x.PackagesServices.some((y) => y.Service.serviceTypeId == 2)) {
           return x;
         }
       });
     }
-    if (
-      (packageSearch.haveSite.isSelected == true &&
-        packageSearch.haveSite.needModification == true) ||
-      (packageSearch.haveSite.isSelected == false &&
-        packageSearch.haveSite.needModification == false)
-    ) {
+
+    if (packageSearch.haveSite == true) {
       data = data.filter((x) => {
         if (x.PackagesServices.some((y) => y.Service.serviceTypeId == 1)) {
           return x;
@@ -94,18 +77,24 @@ export class PackagesService {
       });
     }
 
-    if (
-      (packageSearch.haveSocialMidia.isSelected == true &&
-        packageSearch.haveSocialMidia.needModification == true) ||
-      (packageSearch.haveSocialMidia.isSelected == false &&
-        packageSearch.haveSocialMidia.needModification == false)
-    ) {
+    if (packageSearch.haveSocialMidia == true) {
       data = data.filter((x) => {
-        if (x.PackagesServices.some((y) => y.Service.serviceTypeId == 2)) {
+        if (x.PackagesServices.some((y) => y.Service.serviceTypeId == 3)) {
           return x;
         }
       });
     }
+
+    if (packageSearch.value != null) {
+      data = data.filter(
+        (x) =>
+          x.price >=
+            packageSearch.value * 12 -
+              ((packageSearch.value * 12) / 100) * 20 && x,
+      );
+    }
+
+    await this.prisma.$disconnect();
 
     return data;
   }

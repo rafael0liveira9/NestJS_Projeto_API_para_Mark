@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Req,
+  Query,
 } from '@nestjs/common';
 import { ContratedServicesService } from './contrated-services.service';
 import { CreateContratedServiceDto } from './dto/create-contrated-service.dto';
@@ -19,9 +20,10 @@ export class ContratedServicesController {
   ) {}
 
   @Get()
-  async findAll(@Req() req) {
-    return await this.contratedServicesService.findAll(req);
+  async findAll(@Req() req, @Query() queryData) {
+    return await this.contratedServicesService.findAll(req, queryData);
   }
+
   @Get('all')
   async findAllAdmin() {
     return await this.contratedServicesService.findAllAdmin();
