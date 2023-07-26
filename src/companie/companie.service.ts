@@ -6,7 +6,7 @@ import { ChangeCompanieDto } from './dto/change-companie.dto';
 
 @Injectable()
 export class CompanieService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createCompanieDto: CreateCompanieDto, @Req() req) {
     try {
@@ -181,6 +181,24 @@ export class CompanieService {
       return await this.prisma.companies.findUnique({
         where: {
           id: id,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          Code: HttpStatus.NOT_FOUND,
+          Message: error?.message ?? error,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  async findOneByEmail(document: string) {
+    try {
+      return await this.prisma.companies.findUnique({
+        where: {
+          document: document,
         },
       });
     } catch (error) {

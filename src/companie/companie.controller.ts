@@ -16,7 +16,7 @@ import { ChangeCompanieDto } from './dto/change-companie.dto';
 
 @Controller('companie')
 export class CompanieController {
-  constructor(private readonly companieService: CompanieService) {}
+  constructor(private readonly companieService: CompanieService) { }
 
   @Post()
   create(@Body() createCompanieDto: CreateCompanieDto, @Req() req) {
@@ -44,6 +44,11 @@ export class CompanieController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.companieService.findOne(+id);
+  }
+
+  @Get(':document')
+  findOneByEmail(@Param('document') document: string) {
+    return this.companieService.findOneByEmail(document);
   }
 
   @Patch(':id')

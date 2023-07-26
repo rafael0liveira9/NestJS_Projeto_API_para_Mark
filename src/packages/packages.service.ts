@@ -5,7 +5,7 @@ import { PrismaService } from 'src/singleServices/prisma.service';
 
 @Injectable()
 export class PackagesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(createPackageDto: CreatePackageDto) {
     try {
@@ -89,8 +89,8 @@ export class PackagesService {
       data = data.filter(
         (x) =>
           x.price >=
-            packageSearch.value * 12 -
-              ((packageSearch.value * 12) / 100) * 20 && x,
+          packageSearch.value * 12 -
+          ((packageSearch.value * 12) / 100) * 20 && x,
       );
     }
 
