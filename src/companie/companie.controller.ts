@@ -47,8 +47,8 @@ export class CompanieController {
   }
 
   @Get('/get-doc:document')
-  findOneByEmail(@Param('document') document: string) {
-    return this.companieService.findOneByEmail(document);
+  findOneByDoc(@Param('document') document: string) {
+    return this.companieService.findOneByDoc(document);
   }
 
   @Patch(':id')

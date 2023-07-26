@@ -194,7 +194,7 @@ export class CompanieService {
     }
   }
 
-  async findOneByEmail(document: string) {
+  async findOneByDoc(document: string) {
     try {
       return await this.prisma.companies.findUnique({
         where: {
