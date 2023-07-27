@@ -7,8 +7,8 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: mark-back
-  ECS_SERVICE: ServiceMarkBack
-  ECS_CLUSTER: MarkBack
+  ECS_SERVICE: MarkBackService
+  ECS_CLUSTER: MarkBackCluster
   ECS_TASK_DEFINITION: task-definition.json
   CONTAINER_NAME: MarkBackContainer
 permissions:
