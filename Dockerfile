@@ -11,4 +11,5 @@ COPY package.json .
 
 RUN npm install
 EXPOSE 80
-CMD npx prisma db push && npx prisma generate && npm run build && npm run start:prod
+RUN npx prisma db push && npx prisma generate
+CMD npm run build && npm run start:prod
