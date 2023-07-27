@@ -10,23 +10,25 @@ export class SendImagesService {
   async create(image: Express.Multer.File) {
     try {
       let imageUploaded = await this.uploader.client
-        .from('testebucket')
-        .upload(Utils.slugfy(image.originalname), image.buffer, {
-          contentType: image.mimetype,
-        });
+        .upload({
+          Bucket: process.env.AWS_S3_BUCKET_NAME,
+          Key: Utils.slugfy(image.originalname),
+          Body: image.buffer,
+        })
+        .promise();
 
-      if (!!imageUploaded.error) {
-        throw new HttpException(
-          {
-            Code: imageUploaded.error.name,
-            Message: imageUploaded.error.message,
-          },
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+      // if (!!imageUploaded.error) {
+      //   throw new HttpException(
+      //     {
+      //       Code: imageUploaded.error.name,
+      //       Message: imageUploaded.error.message,
+      //     },
+      //     HttpStatus.BAD_REQUEST,
+      //   );
+      // }
 
       return {
-        path: `${process.env.STORAGE_BASEURL}${imageUploaded.data.path}`,
+        path: `${imageUploaded.Location}`,
       };
     } catch (error: any) {
       console.log(error?.Message);
