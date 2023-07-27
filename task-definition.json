@@ -5,7 +5,15 @@
       {
          "dnsSearchDomains": null,
          "environmentFiles": null,
-         "logConfiguration": null,
+         "logConfiguration": {
+            "logDriver": "awslogs",
+            "secretOptions": null,
+            "options": {
+               "awslogs-group": "/ecs/BuildContainer",
+               "awslogs-region": "us-east-1",
+               "awslogs-stream-prefix": "ecs"
+            }
+         },
          "entryPoint": [],
          "portMappings": [
             {
@@ -29,7 +37,7 @@
          "memoryReservation": null,
          "volumesFrom": [],
          "stopTimeout": null,
-         "image": "065249228369.dkr.ecr.us-east-1.amazonaws.com/mark-back",
+         "image": "065249228369.dkr.ecr.us-east-1.amazonaws.com/mark-back:78ec85970466b588139056de4dc61469b76a06a8",
          "startTimeout": null,
          "firelensConfiguration": null,
          "dependsOn": null,
@@ -42,7 +50,7 @@
          "extraHosts": null,
          "pseudoTerminal": null,
          "user": null,
-         "readonlyRootFilesystem": null,
+         "readonlyRootFilesystem": false,
          "dockerLabels": null,
          "systemControls": null,
          "privileged": null,
@@ -56,14 +64,26 @@
       "EXTERNAL",
       "EC2"
    ],
-   "taskDefinitionArn": "arn:aws:ecs:us-east-1:065249228369:task-definition/BuildContainer:1",
+   "taskDefinitionArn": "arn:aws:ecs:us-east-1:065249228369:task-definition/BuildContainer:26",
    "family": "BuildContainer",
    "requiresAttributes": [
       {
          "targetId": null,
          "targetType": null,
          "value": null,
+         "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+      },
+      {
+         "targetId": null,
+         "targetType": null,
+         "value": null,
          "name": "com.amazonaws.ecs.capability.ecr-auth"
+      },
+      {
+         "targetId": null,
+         "targetType": null,
+         "value": null,
+         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
       }
    ],
    "pidMode": null,
@@ -73,7 +93,7 @@
    "networkMode": "bridge",
    "runtimePlatform": null,
    "cpu": "2048",
-   "revision": 1,
+   "revision": 26,
    "status": "ACTIVE",
    "inferenceAccelerators": null,
    "proxyConfiguration": null,
