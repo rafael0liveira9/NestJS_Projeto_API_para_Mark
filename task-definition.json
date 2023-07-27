@@ -1,6 +1,6 @@
 {
    "ipcMode": null,
-   "executionRoleArn": null,
+   "executionRoleArn": "arn:aws:iam::065249228369:role/ecsTaskExecutionRole",
    "containerDefinitions": [
       {
          "dnsSearchDomains": null,
@@ -9,7 +9,7 @@
             "logDriver": "awslogs",
             "secretOptions": null,
             "options": {
-               "awslogs-group": "/ecs/BuildContainer",
+               "awslogs-group": "/ecs/TaskBuild",
                "awslogs-region": "us-east-1",
                "awslogs-stream-prefix": "ecs"
             }
@@ -24,7 +24,7 @@
          ],
          "command": [],
          "linuxParameters": null,
-         "cpu": 0,
+         "cpu": 16,
          "environment": [],
          "resourceRequirements": null,
          "ulimits": null,
@@ -33,11 +33,11 @@
          "workingDirectory": null,
          "secrets": null,
          "dockerSecurityOptions": null,
-         "memory": null,
-         "memoryReservation": null,
+         "memory": 300,
+         "memoryReservation": 300,
          "volumesFrom": [],
          "stopTimeout": null,
-         "image": "065249228369.dkr.ecr.us-east-1.amazonaws.com/mark-back:78ec85970466b588139056de4dc61469b76a06a8",
+         "image": "065249228369.dkr.ecr.us-east-1.amazonaws.com/mark-back",
          "startTimeout": null,
          "firelensConfiguration": null,
          "dependsOn": null,
@@ -50,7 +50,7 @@
          "extraHosts": null,
          "pseudoTerminal": null,
          "user": null,
-         "readonlyRootFilesystem": false,
+         "readonlyRootFilesystem": null,
          "dockerLabels": null,
          "systemControls": null,
          "privileged": null,
@@ -61,17 +61,23 @@
    "memory": "1024",
    "taskRoleArn": null,
    "compatibilities": [
-      "EXTERNAL",
-      "EC2"
+      "EC2",
+      "FARGATE"
    ],
-   "taskDefinitionArn": "arn:aws:ecs:us-east-1:065249228369:task-definition/BuildContainer:26",
-   "family": "BuildContainer",
+   "taskDefinitionArn": "arn:aws:ecs:us-east-1:065249228369:task-definition/TaskBuild:1",
+   "family": "TaskBuild",
    "requiresAttributes": [
       {
          "targetId": null,
          "targetType": null,
          "value": null,
          "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+      },
+      {
+         "targetId": null,
+         "targetType": null,
+         "value": null,
+         "name": "ecs.capability.execution-role-awslogs"
       },
       {
          "targetId": null,
@@ -84,16 +90,40 @@
          "targetType": null,
          "value": null,
          "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+      },
+      {
+         "targetId": null,
+         "targetType": null,
+         "value": null,
+         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+      },
+      {
+         "targetId": null,
+         "targetType": null,
+         "value": null,
+         "name": "ecs.capability.execution-role-ecr-pull"
+      },
+      {
+         "targetId": null,
+         "targetType": null,
+         "value": null,
+         "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+      },
+      {
+         "targetId": null,
+         "targetType": null,
+         "value": null,
+         "name": "ecs.capability.task-eni"
       }
    ],
    "pidMode": null,
    "requiresCompatibilities": [
-      "EC2"
+      "FARGATE"
    ],
-   "networkMode": "bridge",
+   "networkMode": "awsvpc",
    "runtimePlatform": null,
-   "cpu": "2048",
-   "revision": 26,
+   "cpu": "512",
+   "revision": 1,
    "status": "ACTIVE",
    "inferenceAccelerators": null,
    "proxyConfiguration": null,
