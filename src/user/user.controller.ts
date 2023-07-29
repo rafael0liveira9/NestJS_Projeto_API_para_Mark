@@ -45,6 +45,12 @@ export class UserController {
     return this.userService.findOne(email);
   }
 
+  @Post('search-user-register')
+  @HttpCode(200)
+  findUserByData(@Body() body: { email: string; document: string }) {
+    return this.userService.findByData(body);
+  }
+
   @Put('update-password')
   @HttpCode(200)
   update(@Body() UpdatePasswordDto: UpdatePasswordDto) {

@@ -125,6 +125,25 @@ export class UserService {
     }
   }
 
+  async findByData({ email, document }: { email: string; document: string }) {
+    const findedUser = await this.prisma.client.findFirst({
+      where: {
+        OR: [
+          {
+            User: {
+              email: email,
+            },
+          },
+          {
+            document: document,
+          },
+        ],
+      },
+    });
+
+    return !!findedUser;
+  }
+
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
