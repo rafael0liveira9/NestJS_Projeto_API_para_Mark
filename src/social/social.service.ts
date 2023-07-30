@@ -388,6 +388,62 @@ export class SocialService {
     }
   }
 
+  async publishAndReset(updateShow: UpdateSocialShowDto, req) {
+    const userData = await this.prisma.user.findUnique({
+      where: {
+        id: req.userId,
+      },
+    });
+
+    const socialServiceStatus = await this.prisma.socialService.findUnique({
+      where: {
+        id: updateShow.id,
+      },
+    });
+
+    if (socialServiceStatus.status >= 10) {
+      try {
+        const socialUpdateService = await this.prisma.socialService.update({
+          where: {
+            id: updateShow.id,
+          },
+          data: {
+            status: 1,
+            actualMonth: socialServiceStatus.actualMonth + 1,
+            SocialBriefing: {
+              disconnect: true,
+            },
+            SocialShow: {
+              disconnect: true,
+            },
+          },
+        });
+
+        await this.prisma.$disconnect();
+
+        return socialUpdateService;
+      } catch (error) {
+        await this.prisma.$disconnect();
+        throw new HttpException(
+          {
+            Code: HttpStatus.BAD_REQUEST,
+            Message: `Ocorreu um erro na atualização do serviço`,
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    } else {
+      await this.prisma.$disconnect();
+      throw new HttpException(
+        {
+          Code: HttpStatus.CONFLICT,
+          Message: `Serviço já atualizado.`,
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
+
   async findById(id: number) {
     const data = await this.prisma.socialService.findUnique({
       where: {

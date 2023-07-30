@@ -7,6 +7,7 @@ import {
 import { UpdateBriefingDto } from './dto/update-briefing.dto';
 import { PrismaService } from 'src/singleServices/prisma.service';
 import { AsanaService } from 'src/singleServices/asana.service';
+import { Utils } from 'src/utils/utils';
 
 @Injectable()
 export class BriefingService {
@@ -241,9 +242,19 @@ export class BriefingService {
             },
           },
         });
-
+        const serviceBriefingData = serviceBriefing.createdAt;
+        serviceBriefingData.setMonth(
+          serviceBriefingData.getMonth() + serviceBriefing.actualMonth,
+        );
+        console.log(
+          `${data.Companies.companyName} / Logo / ${Utils.calendarMonths(
+            serviceBriefingData.getMonth(),
+          )}/${serviceBriefing.createdAt.getFullYear()}`,
+        );
         await this.asana.createTask(
-          `Logo / ${data.Companies.companyName}`,
+          `${data.Companies.companyName} / Logo / ${Utils.calendarMonths(
+            serviceBriefingData.getMonth(),
+          )}/${serviceBriefing.createdAt.getFullYear()}`,
           `
           BRIEFING:
 

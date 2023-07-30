@@ -23,6 +23,11 @@ export class SiteController {
     return this.siteService.toLayout(createSiteDto);
   }
 
+  @Post('to-plan')
+  toPlanPost(@Body() createSiteDto: CreateSiteDto) {
+    return this.siteService.toPlan(createSiteDto);
+  }
+
   @Put('to-show')
   toShow(@Body() selectLayout: SelectLayoutDto, @Req() req) {
     return this.siteService.toShow(selectLayout, req);

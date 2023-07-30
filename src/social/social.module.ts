@@ -20,6 +20,7 @@ export class SocialModule {
         { path: '/social/to-plan', method: RequestMethod.POST },
         { path: '/social/to-pending-publish', method: RequestMethod.POST },
         { path: '/social/to-publish', method: RequestMethod.POST },
+        { path: '/social/reset-service', method: RequestMethod.POST },
       )
       .apply(AutheticationUserMiddleware)
       .forRoutes(

@@ -367,6 +367,7 @@ model SocialContratedItems {
 model SocialService {
   id                   Int                    @id @default(autoincrement())
   status               Int                    @default(1)
+  actualMonth          Int                    @default(1)
   createdAt            DateTime               @default(now())
   updatedAt            DateTime?
   dueDate              DateTime?

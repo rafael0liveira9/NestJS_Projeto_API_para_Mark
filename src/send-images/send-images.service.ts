@@ -14,6 +14,8 @@ export class SendImagesService {
           Bucket: process.env.AWS_S3_BUCKET_NAME,
           Key: Utils.slugfy(image.originalname),
           Body: image.buffer,
+          ACL: 'public-read',
+          ContentType: image.mimetype,
         })
         .promise();
 
@@ -21,6 +23,7 @@ export class SendImagesService {
         path: `${imageUploaded.Location}`,
       };
     } catch (error: any) {
+      console.log(error);
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,

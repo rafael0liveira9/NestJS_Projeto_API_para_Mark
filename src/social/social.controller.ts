@@ -57,6 +57,11 @@ export class SocialController {
     return this.socialService.updateApproveFinal(updateShow, req);
   }
 
+  @Post('reset-service')
+  resetService(@Body() updateShow: UpdateSocialShowDto, @Req() req) {
+    return this.socialService.publishAndReset(updateShow, req);
+  }
+
   @Get(':id')
   serviceById(@Param('id') id: string) {
     return this.socialService.findById(+id);

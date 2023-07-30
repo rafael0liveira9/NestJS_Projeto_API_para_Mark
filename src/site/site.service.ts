@@ -44,6 +44,48 @@ export class SiteService {
 
       return serviceData;
     } catch (error) {
+      await this.prisma.$disconnect();
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Ocorreu um erro ao atualizar o serviço.`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async toPlan(createSiteDto: CreateSiteDto) {
+    const service = await this.prisma.siteService.findUnique({
+      where: {
+        id: createSiteDto.id,
+      },
+    });
+
+    if (service.status != 2)
+      throw new HttpException(
+        {
+          Code: HttpStatus.CONFLICT,
+          Message: `Serviço já atualizado`,
+        },
+        HttpStatus.CONFLICT,
+      );
+
+    try {
+      const serviceData = await this.prisma.siteService.update({
+        where: {
+          id: createSiteDto.id,
+        },
+        data: {
+          status: 3,
+        },
+      });
+
+      await this.prisma.$disconnect();
+
+      return serviceData;
+    } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -153,7 +195,7 @@ export class SiteService {
 
     await this.prisma.$disconnect();
 
-    if (service.status != 6)
+    if (service.status > 7 || service.status < 6)
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -170,8 +212,15 @@ export class SiteService {
         data: {
           status: 7,
           SiteLayoutFinished: {
-            create: {
-              layoutId: selectLayout.imageId,
+            upsert: {
+              create: {
+                layoutId: selectLayout.imageId,
+                isApproved: undefined,
+              },
+              update: {
+                layoutId: selectLayout.imageId,
+                isApproved: undefined,
+              },
             },
           },
         },
@@ -198,7 +247,7 @@ export class SiteService {
       },
     });
 
-    if (service.status != 6)
+    if (service.status != 7)
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -213,12 +262,11 @@ export class SiteService {
           id: selectLayout.id,
         },
         data: {
-          status: selectLayout.isApproved ? 7 : 6,
+          status: selectLayout.isApproved ? 8 : 7,
           SiteLayoutFinished: {
             update: {
               isApproved: selectLayout.isApproved,
               refuseReason: selectLayout.refuseReason,
-              layoutId: selectLayout.imageId,
             },
           },
         },
@@ -249,7 +297,7 @@ export class SiteService {
 
     await this.prisma.$disconnect();
 
-    if (service.status != 7)
+    if (service.status != 8)
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -264,7 +312,7 @@ export class SiteService {
           id: selectLayout.id,
         },
         data: {
-          status: 8,
+          status: 9,
           isPublished: true,
         },
       });
