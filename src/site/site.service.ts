@@ -40,6 +40,8 @@ export class SiteService {
         },
       });
 
+      await this.prisma.$disconnect();
+
       return serviceData;
     } catch (error) {
       throw new HttpException(
@@ -83,8 +85,11 @@ export class SiteService {
         },
       });
 
+      await this.prisma.$disconnect();
+
       return serviceData;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -101,6 +106,8 @@ export class SiteService {
         id: selectLayout.id,
       },
     });
+
+    await this.prisma.$disconnect();
 
     if (service.status != 5)
       throw new HttpException(
@@ -121,8 +128,12 @@ export class SiteService {
         },
       });
 
+      await this.prisma.$disconnect();
+
       return serviceData;
     } catch (error) {
+      await this.prisma.$disconnect();
+
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -139,6 +150,8 @@ export class SiteService {
         id: selectLayout.id,
       },
     });
+
+    await this.prisma.$disconnect();
 
     if (service.status != 6)
       throw new HttpException(
@@ -163,8 +176,11 @@ export class SiteService {
           },
         },
       });
+      await this.prisma.$disconnect();
       return serviceData;
     } catch (error) {
+      await this.prisma.$disconnect();
+
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -208,8 +224,12 @@ export class SiteService {
         },
       });
 
+      await this.prisma.$disconnect();
+
       return serviceData;
     } catch (error) {
+      await this.prisma.$disconnect();
+
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -226,6 +246,8 @@ export class SiteService {
         id: selectLayout.id,
       },
     });
+
+    await this.prisma.$disconnect();
 
     if (service.status != 7)
       throw new HttpException(
@@ -247,8 +269,12 @@ export class SiteService {
         },
       });
 
+      await this.prisma.$disconnect();
+
       return serviceData;
     } catch (error) {
+      await this.prisma.$disconnect();
+
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -260,7 +286,7 @@ export class SiteService {
   }
 
   async findById(id: number) {
-    return await this.prisma.siteService.findUnique({
+    const data = await this.prisma.siteService.findUnique({
       where: {
         id,
       },
@@ -283,5 +309,6 @@ export class SiteService {
         },
       },
     });
+    return data;
   }
 }

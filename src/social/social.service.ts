@@ -51,50 +51,50 @@ export class SocialService {
     }
   }
 
-  // async updateStatusToCreation(createSocialDto: CreateSocialDto) {
-  //   const socialService = await this.prisma.socialService.update({
-  //     where: {
-  //       id: createSocialDto.id,
-  //     },
-  //     data: {
-  //       status: 7,
-  //     },
-  //   });
+  async updateStatusToCreation(createSocialDto: CreateSocialDto) {
+    const socialService = await this.prisma.socialService.update({
+      where: {
+        id: createSocialDto.id,
+      },
+      data: {
+        status: 7,
+      },
+    });
 
-  //   await this.prisma.$disconnect();
+    await this.prisma.$disconnect();
 
-  //   return socialService;
-  // }
+    return socialService;
+  }
 
-  // async updateStatusToPendingPublish(createSocialDto: CreateSocialDto) {
-  //   const socialService = await this.prisma.socialService.update({
-  //     where: {
-  //       id: createSocialDto.id,
-  //     },
-  //     data: {
-  //       status: 11,
-  //     },
-  //   });
+  async updateStatusToPendingPublish(createSocialDto: CreateSocialDto) {
+    const socialService = await this.prisma.socialService.update({
+      where: {
+        id: createSocialDto.id,
+      },
+      data: {
+        status: 11,
+      },
+    });
 
-  //   await this.prisma.$disconnect();
+    await this.prisma.$disconnect();
 
-  //   return socialService;
-  // }
+    return socialService;
+  }
 
-  // async updateStatusToPublished(createSocialDto: CreateSocialDto) {
-  //   const socialService = await this.prisma.socialService.update({
-  //     where: {
-  //       id: createSocialDto.id,
-  //     },
-  //     data: {
-  //       status: 12,
-  //     },
-  //   });
+  async updateStatusToPublished(createSocialDto: CreateSocialDto) {
+    const socialService = await this.prisma.socialService.update({
+      where: {
+        id: createSocialDto.id,
+      },
+      data: {
+        status: 12,
+      },
+    });
 
-  //   await this.prisma.$disconnect();
+    await this.prisma.$disconnect();
 
-  //   return socialService;
-  // }
+    return socialService;
+  }
 
   async updateStatusToShow(createSocialDto: CreateSocialDto) {
     const socialServiceStatus = await this.prisma.socialService.findUnique({
@@ -279,6 +279,7 @@ export class SocialService {
 
         return socialUpdateService;
       } catch (error) {
+        await this.prisma.$disconnect();
         throw new HttpException(
           {
             Code: HttpStatus.BAD_REQUEST,
@@ -288,6 +289,15 @@ export class SocialService {
         );
       }
     } else {
+      await this.prisma.$disconnect();
+
+      throw new HttpException(
+        {
+          Code: HttpStatus.CONFLICT,
+          Message: `Serviço já atualizado`,
+        },
+        HttpStatus.CONFLICT,
+      );
     }
   }
 
@@ -353,8 +363,11 @@ export class SocialService {
           },
         });
 
+        await this.prisma.$disconnect();
+
         return socialUpdateService;
       } catch (error) {
+        await this.prisma.$disconnect();
         throw new HttpException(
           {
             Code: HttpStatus.BAD_REQUEST,
@@ -364,6 +377,7 @@ export class SocialService {
         );
       }
     } else {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -375,7 +389,7 @@ export class SocialService {
   }
 
   async findById(id: number) {
-    return await this.prisma.socialService.findUnique({
+    const data = await this.prisma.socialService.findUnique({
       where: {
         id,
       },
@@ -392,5 +406,9 @@ export class SocialService {
         SocialBriefing: true,
       },
     });
+
+    await this.prisma.$disconnect();
+
+    return data;
   }
 }

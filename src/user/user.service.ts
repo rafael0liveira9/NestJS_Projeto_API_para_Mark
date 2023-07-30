@@ -15,11 +15,13 @@ export class UserService {
   }
 
   async findAll() {
-    return await this.prisma.user.findMany({
+    const data = await this.prisma.user.findMany({
       where: {
         deletedAt: null,
       },
     });
+    await this.prisma.$disconnect();
+    return data;
   }
 
   async findOne(email: string) {
@@ -28,6 +30,8 @@ export class UserService {
         email,
       },
     });
+
+    await this.prisma.$disconnect();
 
     if (!userData)
       throw new HttpException(
@@ -55,6 +59,8 @@ export class UserService {
         },
       });
 
+      await this.prisma.$disconnect();
+
       if (userData) {
         return userData;
       } else {
@@ -70,6 +76,8 @@ export class UserService {
           },
         });
 
+        await this.prisma.$disconnect();
+
         return userData;
       }
     } catch (error) {
@@ -84,6 +92,8 @@ export class UserService {
         email: updatePasswordDto.email,
       },
     });
+
+    await this.prisma.$disconnect();
 
     if (!userdata)
       throw new HttpException(
@@ -113,8 +123,11 @@ export class UserService {
         },
       });
 
+      await this.prisma.$disconnect();
+
       return 'Senha Alterada com Sucesso';
     } else {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -140,6 +153,8 @@ export class UserService {
         ],
       },
     });
+
+    await this.prisma.$disconnect();
 
     return !!findedUser;
   }

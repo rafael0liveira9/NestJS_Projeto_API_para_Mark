@@ -66,6 +66,8 @@ export class PaymentService {
           },
         });
 
+        await this.prisma.$disconnect();
+
         return await this.sendPaymentData(
           createPaymentDto,
           clientData,
@@ -74,6 +76,7 @@ export class PaymentService {
           uuidPayment,
         );
       } catch (error) {
+        await this.prisma.$disconnect();
         throw new HttpException(
           {
             Code: HttpStatus.BAD_REQUEST,
@@ -83,6 +86,7 @@ export class PaymentService {
         );
       }
     } else {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -171,6 +175,8 @@ export class PaymentService {
               },
             });
 
+            await this.prisma.$disconnect();
+
             return contratedService;
           } else if (serviceData.serviceTypeId == 2) {
             const contratedService = await this.prisma.contratedService.upsert({
@@ -212,6 +218,8 @@ export class PaymentService {
               },
             });
 
+            await this.prisma.$disconnect();
+
             return contratedService;
           } else if (serviceData.serviceTypeId == 3) {
             const contratedService = await this.prisma.contratedService.upsert({
@@ -252,6 +260,8 @@ export class PaymentService {
                 SiteContratedItems: true,
               },
             });
+
+            await this.prisma.$disconnect();
 
             return contratedService;
           }
@@ -439,8 +449,11 @@ export class PaymentService {
             },
           });
 
+          await this.prisma.$disconnect();
+
           return contratedServices;
         } else {
+          await this.prisma.$disconnect();
           throw new HttpException(
             {
               Code: HttpStatus.BAD_REQUEST,
@@ -451,6 +464,7 @@ export class PaymentService {
         }
       });
     } else {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -475,10 +489,16 @@ export class PaymentService {
 
         await this.finishCheckout(req.payment.externalReference);
       }
-
-      return '';
+      await this.prisma.$disconnect();
+      return 'OK';
     } catch (error) {
-      return '';
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: 'Ocorreu um erro ao enviar o webhook',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -502,6 +522,8 @@ export class PaymentService {
             HttpStatus.NOT_FOUND,
           );
         }
+
+        await this.prisma.$disconnect();
 
         return {
           price: serviceData.price,
@@ -535,6 +557,8 @@ export class PaymentService {
           total += x.price;
         });
 
+        await this.prisma.$disconnect();
+
         return {
           price: total,
           value: total / createPaymentDto.installments ?? 1,
@@ -547,11 +571,14 @@ export class PaymentService {
         },
       });
 
+      await this.prisma.$disconnect();
+
       return {
         price: packageData.price,
         value: packageData.price / createPaymentDto.installments ?? 1,
       };
     } else {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -574,7 +601,7 @@ export class PaymentService {
     discount?: number,
     voucherId?: number,
   ) {
-    return await this.prisma.payments.create({
+    const data = await this.prisma.payments.create({
       data: {
         uuid,
         clientId: clientData.id,
@@ -606,10 +633,12 @@ export class PaymentService {
         },
       },
     });
+    await this.prisma.$disconnect();
+    return data;
   }
 
   async findAll() {
-    return await this.prisma.payments.findMany({
+    const data = await this.prisma.payments.findMany({
       include: {
         Client: {
           include: {
@@ -624,10 +653,12 @@ export class PaymentService {
         },
       },
     });
+    await this.prisma.$disconnect();
+    return data;
   }
 
   async findOne(id) {
-    return await this.prisma.payments.findUnique({
+    const data = await this.prisma.payments.findUnique({
       where: {
         uuid: id,
       },
@@ -655,6 +686,8 @@ export class PaymentService {
         },
       },
     });
+    await this.prisma.$disconnect();
+    return data;
   }
 
   update(id: number, updatePaymentDto: UpdatePaymentDto) {

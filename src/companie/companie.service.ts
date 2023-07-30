@@ -6,7 +6,7 @@ import { ChangeCompanieDto } from './dto/change-companie.dto';
 
 @Injectable()
 export class CompanieService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createCompanieDto: CreateCompanieDto, @Req() req) {
     try {
@@ -44,12 +44,15 @@ export class CompanieService {
             },
           },
         });
+        await this.prisma.$disconnect();
 
         return companyData;
       } else {
+        await this.prisma.$disconnect();
         throw Error('Compania já existe. Tente outra');
       }
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.FORBIDDEN,
@@ -67,7 +70,8 @@ export class CompanieService {
       },
     });
 
-    if (!userData)
+    if (!userData) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -75,6 +79,7 @@ export class CompanieService {
         },
         HttpStatus.NOT_FOUND,
       );
+    }
 
     if (userData) {
       try {
@@ -83,9 +88,11 @@ export class CompanieService {
             ownerId: userData.id,
           },
         });
+        await this.prisma.$disconnect();
 
         return companies;
       } catch (error) {
+        await this.prisma.$disconnect();
         throw new HttpException(
           {
             Code: HttpStatus.NOT_FOUND,
@@ -111,7 +118,8 @@ export class CompanieService {
       },
     });
 
-    if (!userData)
+    if (!userData) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -119,6 +127,7 @@ export class CompanieService {
         },
         HttpStatus.NOT_FOUND,
       );
+    }
 
     if (userData) {
       if (companieData) {
@@ -132,8 +141,11 @@ export class CompanieService {
             },
           });
 
+          await this.prisma.$disconnect();
+
           return clientData;
         } catch (error) {
+          await this.prisma.$disconnect();
           throw new HttpException(
             {
               Code: HttpStatus.BAD_REQUEST,
@@ -143,6 +155,7 @@ export class CompanieService {
           );
         }
       } else {
+        await this.prisma.$disconnect();
         throw new HttpException(
           {
             Code: HttpStatus.NOT_FOUND,
@@ -156,7 +169,7 @@ export class CompanieService {
 
   async findAll() {
     try {
-      return await this.prisma.companies.findMany({
+      const data = await this.prisma.companies.findMany({
         include: {
           Client: {
             include: {
@@ -165,7 +178,10 @@ export class CompanieService {
           },
         },
       });
+      await this.prisma.$disconnect();
+      return data;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.FORBIDDEN,
@@ -178,12 +194,15 @@ export class CompanieService {
 
   async findOne(id: number) {
     try {
-      return await this.prisma.companies.findUnique({
+      const data = await this.prisma.companies.findUnique({
         where: {
           id: id,
         },
       });
+      await this.prisma.$disconnect();
+      return data;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -196,12 +215,15 @@ export class CompanieService {
 
   async findOneByDoc(document: string) {
     try {
-      return await this.prisma.companies.findUnique({
+      const data = await this.prisma.companies.findUnique({
         where: {
           document: document,
         },
       });
+      await this.prisma.$disconnect();
+      return data;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -214,7 +236,7 @@ export class CompanieService {
 
   async update(id: number, updateCompanieDto: UpdateCompanieDto) {
     try {
-      return await this.prisma.companies.update({
+      const data = await this.prisma.companies.update({
         where: {
           id: id,
         },
@@ -233,7 +255,10 @@ export class CompanieService {
           },
         },
       });
+      await this.prisma.$disconnect();
+      return data;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -246,12 +271,15 @@ export class CompanieService {
 
   async remove(id: number) {
     try {
-      return await this.prisma.companies.delete({
+      const data = await this.prisma.companies.delete({
         where: {
           id: id,
         },
       });
+      await this.prisma.$disconnect();
+      return data;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,

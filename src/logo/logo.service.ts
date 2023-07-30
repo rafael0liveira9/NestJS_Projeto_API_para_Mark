@@ -19,6 +19,8 @@ export class LogoService {
     });
 
     if (logoService.status != 3) {
+      await this.prisma.$disconnect();
+
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -52,6 +54,7 @@ export class LogoService {
 
       return itemData;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -76,6 +79,7 @@ export class LogoService {
     });
 
     if (logoService.status < 4 || logoService.status > 5) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -135,6 +139,7 @@ export class LogoService {
       return upLogo;
     } catch (error) {
       console.log(error);
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -172,6 +177,7 @@ export class LogoService {
 
       return upLogo;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -190,6 +196,7 @@ export class LogoService {
     });
 
     if (logoService.status < 7) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -221,6 +228,7 @@ export class LogoService {
 
       return upLogo;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -232,28 +240,43 @@ export class LogoService {
   }
 
   async serviceById(id: number) {
-    return await this.prisma.logoService.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        LogoArchives: {
-          include: {
-            preview: true,
-          },
+    try {
+      const data = await this.prisma.logoService.findUnique({
+        where: {
+          id,
         },
-        LogoBriefing: true,
-        LogoFeedback: true,
-        LogoProof: {
-          include: {
-            Mockups: {
-              include: {
-                image: true,
+        include: {
+          LogoArchives: {
+            include: {
+              preview: true,
+            },
+          },
+          LogoBriefing: true,
+          LogoFeedback: true,
+          LogoProof: {
+            include: {
+              Mockups: {
+                include: {
+                  image: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      });
+
+      await this.prisma.$disconnect();
+
+      return data;
+    } catch (error) {
+      await this.prisma.$disconnect();
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Ocorreu um erro na busca do serviço`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

@@ -35,9 +35,11 @@ export class LeadService {
         },
       });
 
+      await this.prisma.$disconnect();
+
       return lead;
     } catch (error) {
-      console.log(error);
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -50,8 +52,11 @@ export class LeadService {
 
   async findAll() {
     try {
-      return await this.prisma.lead.findMany({});
+      const data = await this.prisma.lead.findMany({});
+      await this.prisma.$disconnect();
+      return data;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -64,12 +69,15 @@ export class LeadService {
 
   async findOne(id: number) {
     try {
-      return await this.prisma.lead.findUnique({
+      const data = await this.prisma.lead.findUnique({
         where: {
           id: id,
         },
       });
+      await this.prisma.$disconnect();
+      return data;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -82,7 +90,7 @@ export class LeadService {
 
   async update(id: number, updateLeadDto: UpdateLeadDto) {
     try {
-      return await this.prisma.lead.update({
+      const data = await this.prisma.lead.update({
         where: {
           id,
         },
@@ -93,7 +101,10 @@ export class LeadService {
           updatedAt: new Date(),
         },
       });
+      await this.prisma.$disconnect();
+      return data;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
@@ -113,7 +124,7 @@ export class LeadService {
       })
     )
       try {
-        return await this.prisma.lead.update({
+        const data = await this.prisma.lead.update({
           where: {
             email: createLeadDto.email,
           },
@@ -121,7 +132,12 @@ export class LeadService {
             subscribeAt: new Date(),
           },
         });
+
+        await this.prisma.$disconnect();
+
+        return data;
       } catch (error) {
+        await this.prisma.$disconnect();
         throw new HttpException(
           {
             Code: HttpStatus.BAD_REQUEST,
@@ -137,12 +153,15 @@ export class LeadService {
 
   async remove(id: number) {
     try {
-      return await this.prisma.lead.delete({
+      const data = await this.prisma.lead.delete({
         where: {
           id: id,
         },
       });
+      await this.prisma.$disconnect();
+      return data;
     } catch (error) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,

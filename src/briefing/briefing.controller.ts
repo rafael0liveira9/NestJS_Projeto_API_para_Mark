@@ -33,27 +33,4 @@ export class BriefingController {
   createBriefingSite(@Body() createBriefingDto: CreateBriefingSiteDto) {
     return this.briefingService.createSite(createBriefingDto);
   }
-
-  @Get()
-  findAll() {
-    return this.briefingService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.briefingService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateBriefingDto: UpdateBriefingDto,
-  ) {
-    return this.briefingService.update(+id, updateBriefingDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.briefingService.remove(+id);
-  }
 }

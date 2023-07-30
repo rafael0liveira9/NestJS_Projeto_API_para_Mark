@@ -17,22 +17,17 @@ export class SendImagesService {
         })
         .promise();
 
-      // if (!!imageUploaded.error) {
-      //   throw new HttpException(
-      //     {
-      //       Code: imageUploaded.error.name,
-      //       Message: imageUploaded.error.message,
-      //     },
-      //     HttpStatus.BAD_REQUEST,
-      //   );
-      // }
-
       return {
         path: `${imageUploaded.Location}`,
       };
     } catch (error: any) {
-      console.log(error?.Message);
-      return error?.Message ?? 'Erro ao enviar foto, tente novamente.';
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: 'Erro ao enviar imagem, tente novamente',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

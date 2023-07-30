@@ -18,6 +18,8 @@ export class ServiceService {
       },
     });
 
+    await this.prisma.$disconnect();
+
     return serviceAdded;
   }
 
@@ -42,21 +44,25 @@ export class ServiceService {
       },
     });
 
+    await this.prisma.$disconnect();
+
     return !!price
       ? services.filter((x) => !!price && x.price <= price && x)
       : services;
   }
 
   async findOne(id: number) {
-    return await this.prisma.service.findUnique({
+    const data = await this.prisma.service.findUnique({
       where: {
         id: id,
       },
     });
+    await this.prisma.$disconnect();
+    return data;
   }
 
   async update(id: number, updateServiceDto: UpdateServiceDto) {
-    return await this.prisma.service.update({
+    const data = await this.prisma.service.update({
       where: {
         id: id,
       },
@@ -68,10 +74,12 @@ export class ServiceService {
         updatedAt: new Date(),
       },
     });
+    await this.prisma.$disconnect();
+    return data;
   }
 
   async remove(id: number) {
-    return await this.prisma.service.update({
+    const data = await this.prisma.service.update({
       where: {
         id: id,
       },
@@ -79,5 +87,7 @@ export class ServiceService {
         deletedAt: new Date(),
       },
     });
+    await this.prisma.$disconnect();
+    return data;
   }
 }

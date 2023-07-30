@@ -86,12 +86,15 @@ export class BriefingService {
         `,
         );
 
+        await this.prisma.$disconnect();
+
         return serviceBriefing;
       } else {
+        await this.prisma.$disconnect();
         throw Error('Nenhum serviço encontrado.');
       }
     } catch (error) {
-      console.log(error?.response.data);
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -170,8 +173,11 @@ export class BriefingService {
         `,
         );
 
+        await this.prisma.$disconnect();
+
         return serviceBriefing;
       } else {
+        await this.prisma.$disconnect();
         throw new HttpException(
           {
             Code: HttpStatus.NOT_FOUND,
@@ -181,7 +187,7 @@ export class BriefingService {
         );
       }
     } catch (error) {
-      console.log(error);
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -250,8 +256,11 @@ export class BriefingService {
         `,
         );
 
+        await this.prisma.$disconnect();
+
         return serviceBriefing;
       } else {
+        await this.prisma.$disconnect();
         throw new HttpException(
           {
             Code: HttpStatus.NOT_FOUND,
@@ -261,6 +270,7 @@ export class BriefingService {
         );
       }
     } catch (error) {
+      await this.prisma.$disconnect();
       console.log(error);
       throw new HttpException(
         {
@@ -270,21 +280,5 @@ export class BriefingService {
         HttpStatus.NOT_FOUND,
       );
     }
-  }
-
-  findAll() {
-    return `This action returns all briefing`;
-  }
-
-  findOne(id: number) {
-    return;
-  }
-
-  update(id: number, updateBriefingDto: UpdateBriefingDto) {
-    return `This action updates a #${id} briefing`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} briefing`;
   }
 }

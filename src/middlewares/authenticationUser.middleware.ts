@@ -30,6 +30,8 @@ export class AutheticationUserMiddleware implements NestMiddleware {
         },
       });
 
+      await this.prisma.$disconnect();
+
       if (userData.roleTypeId <= 3) {
         req.userId = userData.id;
         req.id = jwtData.id;
@@ -39,7 +41,7 @@ export class AutheticationUserMiddleware implements NestMiddleware {
         throw Error('Usuário sem Permissão');
       }
     } catch (error) {
-      console.log(error);
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.UNAUTHORIZED,

@@ -13,10 +13,6 @@ import { PrismaService } from 'src/singleServices/prisma.service';
 export class ContratedServicesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createContratedServiceDto: CreateContratedServiceDto) {
-    return 'This action adds a new contratedService';
-  }
-
   async findAll(@Req() req, @Query() query) {
     const userData = await this.prisma.client.findUnique({
       where: {
@@ -28,6 +24,7 @@ export class ContratedServicesService {
     });
 
     if (!userData.Companie) {
+      await this.prisma.$disconnect();
       throw new HttpException(
         {
           Code: HttpStatus.NOT_FOUND,
@@ -127,9 +124,10 @@ export class ContratedServicesService {
                 : false,
           },
         });
-        this.prisma.$disconnect();
+        await this.prisma.$disconnect();
         return contratedServices ?? {};
       } catch (error) {
+        await this.prisma.$disconnect();
         throw new HttpException(
           {
             Code: HttpStatus.BAD_REQUEST,
@@ -142,25 +140,69 @@ export class ContratedServicesService {
   }
 
   async findAllAdmin() {
-    const data = await this.prisma.contratedService.findMany({
-      include: {
-        Companies: true,
-        LogoContratedItems: {
-          include: {
-            LogoService: {
-              include: {
-                LogoArchives: {
-                  include: {
-                    preview: true,
+    try {
+      const data = await this.prisma.contratedService.findMany({
+        include: {
+          Companies: true,
+          LogoContratedItems: {
+            include: {
+              LogoService: {
+                include: {
+                  LogoArchives: {
+                    include: {
+                      preview: true,
+                    },
+                  },
+                  LogoBriefing: true,
+                  LogoFeedback: true,
+                  LogoProof: {
+                    include: {
+                      Mockups: {
+                        include: {
+                          image: true,
+                        },
+                      },
+                    },
                   },
                 },
-                LogoBriefing: true,
-                LogoFeedback: true,
-                LogoProof: {
-                  include: {
-                    Mockups: {
-                      include: {
-                        image: true,
+              },
+            },
+          },
+          SiteContratedItems: {
+            include: {
+              SiteService: {
+                include: {
+                  SiteBriefing: true,
+                  SiteLayoutBase: {
+                    include: {
+                      Layout: true,
+                    },
+                  },
+                  SiteLayoutFinished: {
+                    include: {
+                      LayoutFinshed: true,
+                    },
+                  },
+                  SiteLayoutSelected: {
+                    include: {
+                      LayoutSelected: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          SocialContratedItems: {
+            include: {
+              SocialService: {
+                include: {
+                  SocialBriefing: true,
+                  SocialShow: {
+                    include: {
+                      feed: {
+                        include: {
+                          Images: true,
+                        },
                       },
                     },
                   },
@@ -169,76 +211,88 @@ export class ContratedServicesService {
             },
           },
         },
-        SiteContratedItems: {
-          include: {
-            SiteService: {
-              include: {
-                SiteBriefing: true,
-                SiteLayoutBase: {
-                  include: {
-                    Layout: true,
-                  },
-                },
-                SiteLayoutFinished: {
-                  include: {
-                    LayoutFinshed: true,
-                  },
-                },
-                SiteLayoutSelected: {
-                  include: {
-                    LayoutSelected: true,
-                  },
-                },
-              },
-            },
-          },
+      });
+      await this.prisma.$disconnect();
+      return data;
+    } catch (error) {
+      await this.prisma.$disconnect();
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: 'Ocorreu um erro ao buscar serviços',
         },
-        SocialContratedItems: {
-          include: {
-            SocialService: {
-              include: {
-                SocialBriefing: true,
-                SocialShow: {
-                  include: {
-                    feed: {
-                      include: {
-                        Images: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-    return data;
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async findById(id: number) {
-    const data = await this.prisma.contratedService.findUnique({
-      where: {
-        id: id,
-      },
-      include: {
-        Companies: true,
-        LogoContratedItems: {
-          include: {
-            LogoService: {
-              include: {
-                LogoArchives: {
-                  include: {
-                    preview: true,
+    try {
+      const data = await this.prisma.contratedService.findUnique({
+        where: {
+          id: id,
+        },
+        include: {
+          Companies: true,
+          LogoContratedItems: {
+            include: {
+              LogoService: {
+                include: {
+                  LogoArchives: {
+                    include: {
+                      preview: true,
+                    },
+                  },
+                  LogoBriefing: true,
+                  LogoFeedback: true,
+                  LogoProof: {
+                    include: {
+                      Mockups: {
+                        include: {
+                          image: true,
+                        },
+                      },
+                    },
                   },
                 },
-                LogoBriefing: true,
-                LogoFeedback: true,
-                LogoProof: {
-                  include: {
-                    Mockups: {
-                      include: {
-                        image: true,
+              },
+            },
+          },
+          SiteContratedItems: {
+            include: {
+              SiteService: {
+                include: {
+                  SiteBriefing: true,
+                  SiteLayoutBase: {
+                    include: {
+                      Layout: true,
+                    },
+                  },
+                  SiteLayoutFinished: {
+                    include: {
+                      LayoutFinshed: true,
+                    },
+                  },
+                  SiteLayoutSelected: {
+                    include: {
+                      LayoutSelected: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          SocialContratedItems: {
+            include: {
+              SocialService: {
+                include: {
+                  SocialBriefing: true,
+                  SocialShow: {
+                    include: {
+                      feed: {
+                        include: {
+                          Images: true,
+                        },
                       },
                     },
                   },
@@ -247,50 +301,18 @@ export class ContratedServicesService {
             },
           },
         },
-        SiteContratedItems: {
-          include: {
-            SiteService: {
-              include: {
-                SiteBriefing: true,
-                SiteLayoutBase: {
-                  include: {
-                    Layout: true,
-                  },
-                },
-                SiteLayoutFinished: {
-                  include: {
-                    LayoutFinshed: true,
-                  },
-                },
-                SiteLayoutSelected: {
-                  include: {
-                    LayoutSelected: true,
-                  },
-                },
-              },
-            },
-          },
+      });
+      await this.prisma.$disconnect();
+      return data;
+    } catch (error) {
+      await this.prisma.$disconnect();
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: 'Ocorreu um erro ao buscar serviços',
         },
-        SocialContratedItems: {
-          include: {
-            SocialService: {
-              include: {
-                SocialBriefing: true,
-                SocialShow: {
-                  include: {
-                    feed: {
-                      include: {
-                        Images: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-    return data;
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
