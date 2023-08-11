@@ -16,7 +16,7 @@ import { ChangeCompanieDto } from './dto/change-companie.dto';
 
 @Controller('companie')
 export class CompanieController {
-  constructor(private readonly companieService: CompanieService) { }
+  constructor(private readonly companieService: CompanieService) {}
 
   @Post()
   create(@Body() createCompanieDto: CreateCompanieDto, @Req() req) {
@@ -33,6 +33,12 @@ export class CompanieController {
   @HttpCode(200)
   findMy(@Req() req) {
     return this.companieService.findMy(req);
+  }
+
+  @Get('archives')
+  @HttpCode(200)
+  getArchives(@Req() req) {
+    return this.companieService.getArchives(req);
   }
 
   @Post('change-active')

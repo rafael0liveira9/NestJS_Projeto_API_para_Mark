@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SendImagesService } from './send-images.service';
+import { SendImagesService } from './send-media.service';
 import { UploaderService } from 'src/singleServices/uploader.service';
 
 describe('SendImagesService', () => {

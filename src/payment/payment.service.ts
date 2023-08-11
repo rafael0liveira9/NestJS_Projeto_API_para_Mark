@@ -118,7 +118,7 @@ export class PaymentService {
 
     let userContratedService = await this.prisma.contratedService.upsert({
       where: {
-        id: paymentData.companiesId,
+        companiesId: paymentData.companiesId,
       },
       create: {
         companiesId: paymentData.companiesId,

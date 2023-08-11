@@ -41,8 +41,6 @@ export class CreateBriefingSiteDto extends CreateBriefingDefaultData {
   @ApiProperty()
   siteModel: 'ONEPAGE' | 'MULTIPAGE' | 'LANDPAGE' | 'MOBILEFIRST' | 'NONE';
   @ApiProperty()
-  url: string;
-  @ApiProperty()
   logo: string;
   @ApiProperty()
   contactData: string;
@@ -50,6 +48,24 @@ export class CreateBriefingSiteDto extends CreateBriefingDefaultData {
   socialMidia: string;
   @ApiProperty()
   references: string;
+  @ApiProperty()
+  archives: string[];
+  @ApiProperty()
+  colors: string[];
+  @ApiProperty()
+  url: string;
+  @ApiProperty()
+  host: string;
+  @ApiProperty()
+  hostLogin: string;
+  @ApiProperty()
+  hostPass: string;
+  @ApiProperty()
+  urlLogin: string;
+  @ApiProperty()
+  urlPass: string;
+  @ApiProperty()
+  urlBriefing: string;
 }
 
 export class CreateBriefingSocialDto extends CreateBriefingDefaultData {

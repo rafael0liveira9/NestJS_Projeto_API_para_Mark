@@ -289,4 +289,32 @@ export class CompanieService {
       );
     }
   }
+
+  async getArchives(@Req() req) {
+    const clientData = await this.prisma.client.findFirst({
+      where: {
+        userId: req.userId,
+      },
+      include: {
+        Companie: true,
+      },
+    });
+
+    if (!clientData)
+      throw new HttpException(
+        {
+          Code: HttpStatus.NOT_FOUND,
+          Message: 'Usuário não encontrado',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+
+    let itens = await this.prisma.archives.findMany({
+      where: {
+        companiesId: clientData.Companie.id,
+      },
+    });
+
+    return itens;
+  }
 }

@@ -142,10 +142,28 @@ export class BriefingService {
                 create: {
                   siteModel: createBriefingDto.siteModel,
                   url: createBriefingDto.url,
+                  urlLogin: createBriefingDto.urlLogin,
+                  urlPass: createBriefingDto.urlPass,
+                  host: createBriefingDto.host,
+                  hostLogin: createBriefingDto.hostLogin,
+                  hostPass: createBriefingDto.hostPass,
                   references: createBriefingDto.references,
                   logo: createBriefingDto.logo,
                   contactData: createBriefingDto.contactData,
                   socialMidia: createBriefingDto.socialMidia,
+                  archives: {
+                    create: createBriefingDto.archives.map((x) => ({
+                      url: x,
+                      companiesId: createBriefingDto.companieId,
+                    })),
+                  },
+                  briefing: {
+                    create: {
+                      url: createBriefingDto.urlBriefing,
+                      companiesId: createBriefingDto.companieId,
+                    },
+                  },
+                  colors: createBriefingDto.colors,
                 },
                 update: {
                   siteModel: createBriefingDto.siteModel,

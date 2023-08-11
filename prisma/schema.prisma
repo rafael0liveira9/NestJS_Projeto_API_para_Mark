@@ -59,6 +59,7 @@ model Companies {
   ContratedService ContratedService[]
   Payments         Payments[]
   PaymentsServices PaymentsServices[]
+  Archives         Archives[]
 }
 
 model ContratedService {
@@ -285,12 +286,21 @@ model ServiceType {
 model SiteBriefing {
   id          Int           @id @default(autoincrement())
   siteModel   SiteModels
+  host        String?
+  hostLogin   String?
+  hostPass    String?
   url         String?
+  urlLogin    String?
+  urlPass     String?
+  colors      Json?
   references  Json?
   logo        String?
   contactData String?
   socialMidia String?
   SiteService SiteService[]
+  briefingId  Int?
+  archives    Archives[]    @relation("archives")
+  briefing    Archives?     @relation("briefing", fields: [briefingId], references: [id])
 }
 
 model SiteContratedItems {
@@ -425,6 +435,18 @@ model User {
   Employee      Employee[]
   Errors        Errors[]
   RoleType      RoleType   @relation(fields: [roleTypeId], references: [id])
+}
+
+model Archives {
+  id             Int            @id @default(autoincrement())
+  url            String
+  companiesId    Int
+  companie       Companies      @relation(fields: [companiesId], references: [id])
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime?
+  siteBriefingId Int?
+  briefing       SiteBriefing?  @relation(name: "archives", fields: [siteBriefingId], references: [id])
+  SiteBriefing   SiteBriefing[] @relation(name: "briefing")
 }
 
 enum EspecificationTypes {
