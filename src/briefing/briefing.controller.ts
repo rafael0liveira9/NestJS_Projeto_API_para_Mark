@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { BriefingService } from './briefing.service';
 import {
@@ -30,7 +31,10 @@ export class BriefingController {
   }
 
   @Post('site')
-  createBriefingSite(@Body() createBriefingDto: CreateBriefingSiteDto) {
-    return this.briefingService.createSite(createBriefingDto);
+  createBriefingSite(
+    @Body() createBriefingDto: CreateBriefingSiteDto,
+    @Req() req,
+  ) {
+    return this.briefingService.createSite(createBriefingDto, req);
   }
 }

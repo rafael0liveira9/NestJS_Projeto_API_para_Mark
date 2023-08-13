@@ -10,11 +10,25 @@ export class ServiceService {
   async create(createServiceDto: CreateServiceDto) {
     const serviceAdded = await this.prisma.service.create({
       data: {
-        serviceTypeId: createServiceDto.serviceTypeId,
         name: createServiceDto.name,
         price: createServiceDto.price,
         description: createServiceDto.description,
         updatedAt: new Date(),
+        ServiceType: {
+          connect: {
+            id: createServiceDto.serviceTypeId,
+          },
+        },
+        modelService: {
+          connectOrCreate: {
+            where: {
+              id: createServiceDto.modelId,
+            },
+            create: {
+              name: createServiceDto.model.name,
+            },
+          },
+        },
       },
     });
 

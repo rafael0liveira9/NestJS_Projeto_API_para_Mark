@@ -9,4 +9,10 @@ export class CreateServiceDto {
   description: string;
   @ApiProperty()
   serviceTypeId: number;
+  @ApiProperty()
+  model: {
+    name: string;
+  };
+  @ApiProperty()
+  modelId: number;
 }

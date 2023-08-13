@@ -199,6 +199,8 @@ model LogoProofMockups {
   logoProofId Int?
   image       Images     @relation(fields: [imagesId], references: [id])
   LogoProof   LogoProof? @relation(fields: [logoProofId], references: [id])
+  createdAt   DateTime   @default(now())
+  deleteAt    DateTime?
 }
 
 model Packages {
@@ -272,24 +274,37 @@ model Service {
   PackagesServices PackagesServices[]
   PaymentsServices PaymentsServices[]
   ServiceType      ServiceType        @relation(fields: [serviceTypeId], references: [id])
+  modelServiceId   Int?
+  modelService     ServiceTypeChoose? @relation(fields: [modelServiceId], references: [id])
 }
 
 model ServiceType {
-  id            Int             @id @default(autoincrement())
+  id                Int                 @id @default(autoincrement())
+  name              String
+  LogoService       LogoService[]
+  Service           Service[]
+  SiteService       SiteService[]
+  SocialService     SocialService[]
+  createdAt         DateTime            @default(now())
+  serviceTypeChoose ServiceTypeChoose[]
+}
+
+model ServiceTypeChoose {
+  id            Int          @id @default(autoincrement())
   name          String
-  LogoService   LogoService[]
+  createdAt     DateTime     @default(now())
   Service       Service[]
-  SiteService   SiteService[]
-  SocialService SocialService[]
+  serviceTypeId Int?
+  ServiceType   ServiceType? @relation(fields: [serviceTypeId], references: [id])
 }
 
 model SiteBriefing {
   id          Int           @id @default(autoincrement())
-  siteModel   SiteModels
   host        String?
   hostLogin   String?
   hostPass    String?
   url         String?
+  urlName     String?
   urlLogin    String?
   urlPass     String?
   colors      Json?

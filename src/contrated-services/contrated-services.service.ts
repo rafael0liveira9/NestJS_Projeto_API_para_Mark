@@ -230,7 +230,7 @@ export class ContratedServicesService {
     try {
       const data = await this.prisma.contratedService.findUnique({
         where: {
-          id: id,
+          companiesId: id,
         },
         include: {
           Companies: true,

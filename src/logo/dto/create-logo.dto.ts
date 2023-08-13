@@ -17,6 +17,8 @@ export class SendArchivesDto {
   @ApiProperty()
   id: number;
   @ApiProperty()
+  companieId: number;
+  @ApiProperty()
   archives: ArchivesModel[];
 }
 

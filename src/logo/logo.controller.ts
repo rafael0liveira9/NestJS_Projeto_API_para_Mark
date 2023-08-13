@@ -21,6 +21,15 @@ import { UpdateLogoDto } from './dto/update-logo.dto';
 export class LogoController {
   constructor(private readonly logoService: LogoService) {}
 
+  @Post('to-plan')
+  toPlan(@Body() createLogoDto: CreateLogoDto, @Req() req) {
+    return this.logoService.toPlan(createLogoDto, req);
+  }
+  @Post('to-archives')
+  toArchives(@Body() createLogoDto: CreateLogoDto, @Req() req) {
+    return this.logoService.toArchives(createLogoDto, req);
+  }
+
   @Post('to-proof')
   toProof(@Body() createLogoDto: CreateLogoDto, @Req() req) {
     return this.logoService.toProof(createLogoDto, req);

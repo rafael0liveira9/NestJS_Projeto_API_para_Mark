@@ -11,6 +11,94 @@ import { PrismaService } from 'src/singleServices/prisma.service';
 export class LogoService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async toPlan(createLogoDto: CreateLogoDto, req) {
+    const logoService = await this.prisma.logoService.findUnique({
+      where: {
+        id: createLogoDto.id,
+      },
+    });
+
+    if (logoService.status != 2) {
+      await this.prisma.$disconnect();
+
+      throw new HttpException(
+        {
+          Code: HttpStatus.CONFLICT,
+          Message: `Serviço não pode ser atualizado no momento.`,
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    try {
+      let itemData = await this.prisma.logoService.update({
+        where: {
+          id: createLogoDto.id,
+        },
+        data: {
+          status: 3,
+        },
+      });
+
+      await this.prisma.$disconnect();
+
+      return itemData;
+    } catch (error) {
+      await this.prisma.$disconnect();
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Um erro ocorreu na atualização do serviço. ${error}`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async toArchives(createLogoDto: CreateLogoDto, req) {
+    const logoService = await this.prisma.logoService.findUnique({
+      where: {
+        id: createLogoDto.id,
+      },
+    });
+
+    if (logoService.status != 6) {
+      await this.prisma.$disconnect();
+
+      throw new HttpException(
+        {
+          Code: HttpStatus.CONFLICT,
+          Message: `Serviço não pode ser atualizado no momento.`,
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    try {
+      let itemData = await this.prisma.logoService.update({
+        where: {
+          id: createLogoDto.id,
+        },
+        data: {
+          status: 7,
+        },
+      });
+
+      await this.prisma.$disconnect();
+
+      return itemData;
+    } catch (error) {
+      await this.prisma.$disconnect();
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Um erro ocorreu na atualização do serviço. ${error}`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   async toProof(createLogoDto: CreateLogoDto, req) {
     const logoService = await this.prisma.logoService.findUnique({
       where: {
@@ -68,13 +156,30 @@ export class LogoService {
   async updateProof(updateLogo: UpdateLogoDto, req) {
     const logoService = await this.prisma.logoService.findUnique({
       where: {
-        id: updateLogo.id,
+        id: +updateLogo.id,
+      },
+      include: {
+        LogoProof: {
+          include: {
+            Mockups: true,
+          },
+        },
       },
     });
 
+    let mockupDelete = [];
+
+    if (updateLogo.mockupsUp != null) {
+      logoService.LogoProof.Mockups.forEach((x) => {
+        console.log(x, updateLogo.mockupsUp);
+        if (updateLogo.mockupsUp.some((y) => y.id != x.id))
+          mockupDelete.push(x.id);
+      });
+    }
+
     const userData = await this.prisma.user.findUnique({
       where: {
-        id: req.userId,
+        id: +req.userId,
       },
     });
 
@@ -89,21 +194,31 @@ export class LogoService {
       );
     }
 
-    let mockups = {},
+    let mockups = {
+        Mockups: {},
+      },
       imageId = {};
 
+    if (mockupDelete.length > 0) {
+      mockups.Mockups = {
+        ...mockups.Mockups,
+        update: mockupDelete.map((x) => ({
+          where: {
+            id: x,
+          },
+          data: {
+            deleteAt: new Date().toISOString(),
+          },
+        })),
+      };
+    }
+
     if (updateLogo.mockupsUp != null) {
-      mockups = {
-        Mockups: {
-          update: updateLogo.mockupsUp.map((x) => ({
-            where: {
-              id: x.id,
-            },
-            data: {
-              imagesId: x.image,
-            },
-          })),
-        },
+      mockups.Mockups = {
+        ...mockups.Mockups,
+        create: updateLogo.mockupsUp.map((x) => ({
+          imagesId: +x.image,
+        })),
       };
     }
 
@@ -116,7 +231,7 @@ export class LogoService {
     try {
       const upLogo = await this.prisma.logoService.update({
         where: {
-          id: updateLogo.id,
+          id: +updateLogo.id,
         },
         data: {
           status: userData.roleTypeId > 1 ? 4 : updateLogo.isApproved ? 6 : 5,
@@ -191,11 +306,13 @@ export class LogoService {
   async addArchives(sendArchive: SendArchivesDto, req) {
     const logoService = await this.prisma.logoService.findUnique({
       where: {
-        id: sendArchive.id,
+        id: +sendArchive.id,
       },
     });
 
-    if (logoService.status < 7) {
+    console.log(logoService.status);
+
+    if (logoService.status != 7) {
       await this.prisma.$disconnect();
       throw new HttpException(
         {
@@ -209,7 +326,7 @@ export class LogoService {
     try {
       const upLogo = await this.prisma.logoService.update({
         where: {
-          id: sendArchive.id,
+          id: +sendArchive.id,
         },
         data: {
           status: 8,
@@ -218,16 +335,24 @@ export class LogoService {
               name: x.name,
               url: x.url,
               type: x.type,
-              previewId: x.previewImage,
+              previewId: +x.previewImage,
             })),
           },
         },
+      });
+
+      const companieArchives = await this.prisma.archives.createMany({
+        data: sendArchive.archives.map((x) => ({
+          companiesId: +sendArchive.companieId,
+          url: x.url,
+        })),
       });
 
       await this.prisma.$disconnect();
 
       return upLogo;
     } catch (error) {
+      console.log(error);
       await this.prisma.$disconnect();
       throw new HttpException(
         {
@@ -255,7 +380,11 @@ export class LogoService {
           LogoFeedback: true,
           LogoProof: {
             include: {
+              proofImage: true,
               Mockups: {
+                where: {
+                  deleteAt: null,
+                },
                 include: {
                   image: true,
                 },

@@ -14,7 +14,11 @@ export class LogoModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthenticationAdminMiddleware)
-      .forRoutes({ path: '/logo/to-proof', method: RequestMethod.POST })
+      .forRoutes(
+        { path: '/logo/to-proof', method: RequestMethod.POST },
+        { path: '/logo/to-plan', method: RequestMethod.POST },
+        { path: '/logo/to-archives', method: RequestMethod.POST },
+      )
       .apply(AutheticationUserMiddleware)
       .forRoutes({ path: '/logo/to-proof', method: RequestMethod.PUT });
   }

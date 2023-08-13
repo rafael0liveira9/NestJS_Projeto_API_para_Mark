@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Req } from '@nestjs/common';
 import {
   CreateBriefingLogoDto,
   CreateBriefingSiteDto,
@@ -105,11 +105,17 @@ export class BriefingService {
       );
     }
   }
-  async createSite(createBriefingDto: CreateBriefingSiteDto) {
+  async createSite(createBriefingDto: CreateBriefingSiteDto, @Req() req) {
     try {
+      const userData = await this.prisma.client.findUnique({
+        where: {
+          userId: req.userId,
+        },
+      });
+
       const data = await this.prisma.contratedService.findFirst({
         where: {
-          companiesId: createBriefingDto.companieId,
+          companiesId: userData.companiesId,
           AND: [
             {
               SiteContratedItems: {
@@ -140,8 +146,8 @@ export class BriefingService {
             SiteBriefing: {
               upsert: {
                 create: {
-                  siteModel: createBriefingDto.siteModel,
                   url: createBriefingDto.url,
+                  urlName: createBriefingDto.urlName,
                   urlLogin: createBriefingDto.urlLogin,
                   urlPass: createBriefingDto.urlPass,
                   host: createBriefingDto.host,
@@ -166,12 +172,30 @@ export class BriefingService {
                   colors: createBriefingDto.colors,
                 },
                 update: {
-                  siteModel: createBriefingDto.siteModel,
                   url: createBriefingDto.url,
+                  urlName: createBriefingDto.urlName,
+                  urlLogin: createBriefingDto.urlLogin,
+                  urlPass: createBriefingDto.urlPass,
+                  host: createBriefingDto.host,
+                  hostLogin: createBriefingDto.hostLogin,
+                  hostPass: createBriefingDto.hostPass,
                   references: createBriefingDto.references,
                   logo: createBriefingDto.logo,
                   contactData: createBriefingDto.contactData,
                   socialMidia: createBriefingDto.socialMidia,
+                  archives: {
+                    create: createBriefingDto.archives.map((x) => ({
+                      url: x,
+                      companiesId: createBriefingDto.companieId,
+                    })),
+                  },
+                  briefing: {
+                    create: {
+                      url: createBriefingDto.urlBriefing,
+                      companiesId: createBriefingDto.companieId,
+                    },
+                  },
+                  colors: createBriefingDto.colors,
                 },
               },
             },
@@ -207,12 +231,13 @@ export class BriefingService {
       }
     } catch (error) {
       await this.prisma.$disconnect();
+      console.log(error);
       throw new HttpException(
         {
-          Code: HttpStatus.NOT_FOUND,
-          Message: 'Nenhum serviço encontrado.',
+          Code: HttpStatus.BAD_REQUEST,
+          Message: 'Ocorreu um erro ao enviar o briefing',
         },
-        HttpStatus.NOT_FOUND,
+        HttpStatus.BAD_REQUEST,
       );
     }
   }

@@ -55,6 +55,8 @@ export class CreateBriefingSiteDto extends CreateBriefingDefaultData {
   @ApiProperty()
   url: string;
   @ApiProperty()
+  urlName: string;
+  @ApiProperty()
   host: string;
   @ApiProperty()
   hostLogin: string;

@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Query,
 } from '@nestjs/common';
 import { SendImagesService } from './send-media.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -29,7 +30,11 @@ export class SendImagesController {
 
   @Post('archive')
   @UseInterceptors(FileInterceptor('file'))
-  archive(@UploadedFile() file: Express.Multer.File, @Req() req) {
-    return this.sendImagesService.sendArchives(file, req);
+  archive(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req,
+    @Query() queries,
+  ) {
+    return this.sendImagesService.sendArchives(file, req, queries);
   }
 }
