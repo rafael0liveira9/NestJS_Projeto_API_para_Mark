@@ -28,17 +28,17 @@ export class SiteController {
     return this.siteService.toPlan(createSiteDto);
   }
 
+  @Post('to-definition')
+  toDefinition(@Body() createSiteDto: CreateSiteDto) {
+    return this.siteService.toDefinition(createSiteDto);
+  }
+
   @Put('to-show')
   toShow(@Body() selectLayout: SelectLayoutDto, @Req() req) {
     return this.siteService.toShow(selectLayout, req);
   }
 
-  @Put('save-show')
-  saveShow(@Body() selectLayout: SelectLayoutDto, @Req() req) {
-    return this.siteService.saveShow(selectLayout, req);
-  }
-
-  @Put('to-layout-finished')
+  @Post('to-layout-finished')
   toLayoutFinished(@Body() selectLayout: SelectLayoutDto, @Req() req) {
     return this.siteService.setLayoutFinished(selectLayout, req);
   }
@@ -48,7 +48,7 @@ export class SiteController {
     return this.siteService.approveLayout(selectLayout, req);
   }
 
-  @Put('publish-layout')
+  @Post('publish-layout')
   publishLayout(@Body() selectLayout: SelectLayoutDto, @Req() req) {
     return this.siteService.published(selectLayout, req);
   }

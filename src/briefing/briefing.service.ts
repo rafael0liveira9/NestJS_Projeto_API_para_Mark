@@ -206,13 +206,40 @@ export class BriefingService {
           `Logo / ${data.Companies.companyName}`,
           `
           BRIEFING:
-
+          ${
+            createBriefingDto.url != null
+              ? `
+          Dominio: ${createBriefingDto.url}
+          Site do Domínio: ${createBriefingDto.urlName}
+          Login do Dominio: ${createBriefingDto.urlLogin}
+          Senha do Dominio: ${createBriefingDto.urlPass}
+          `
+              : 'Sem domínio'
+          }
+          ${
+            createBriefingDto.host != null
+              ? `
+          Host: ${createBriefingDto.host}
+          Login do Host: ${createBriefingDto.hostLogin}
+          Senha do Host: ${createBriefingDto.hostPass}
+          `
+              : 'Sem Hospedagem'
+          }
           Modelo do Site: ${createBriefingDto.siteModel},
           URL do Site: ${createBriefingDto.url},
           Referencias: ${createBriefingDto.references},
           Logo: ${createBriefingDto.logo},
           Dados de Contato: ${createBriefingDto.contactData},
           Social Media: ${createBriefingDto.socialMidia},
+          Cores do Site: {
+            ${createBriefingDto.colors.join(',\n')}
+          }
+          Arquivos: {
+            ${createBriefingDto.archives.join(',\n')}
+          },
+          Briefing criado pelo usuario: {
+            ${createBriefingDto.urlBriefing}
+          }
         `,
         );
 

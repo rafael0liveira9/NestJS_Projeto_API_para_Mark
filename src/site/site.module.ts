@@ -17,8 +17,9 @@ export class SiteModule {
       .forRoutes(
         { path: '/site/to-layout', method: RequestMethod.POST },
         { path: '/site/to-plan', method: RequestMethod.POST },
-        { path: '/site/publish-layout', method: RequestMethod.PUT },
-        { path: '/site/to-layout-finished', method: RequestMethod.PUT },
+        { path: '/site/to-definition', method: RequestMethod.POST },
+        { path: '/site/publish-layout', method: RequestMethod.POST },
+        { path: '/site/to-layout-finished', method: RequestMethod.POST },
       )
       .apply(AutheticationUserMiddleware)
       .forRoutes(

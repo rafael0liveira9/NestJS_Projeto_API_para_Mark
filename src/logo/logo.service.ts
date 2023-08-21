@@ -169,6 +169,8 @@ export class LogoService {
 
     let mockupDelete = [];
 
+    console.log(updateLogo);
+
     if (updateLogo.mockupsUp != null) {
       logoService.LogoProof.Mockups.forEach((x) => {
         console.log(x, updateLogo.mockupsUp);
@@ -310,8 +312,6 @@ export class LogoService {
       },
     });
 
-    console.log(logoService.status);
-
     if (logoService.status != 7) {
       await this.prisma.$disconnect();
       throw new HttpException(
@@ -332,10 +332,14 @@ export class LogoService {
           status: 8,
           LogoArchives: {
             create: sendArchive.archives.map((x) => ({
-              name: x.name,
-              url: x.url,
-              type: x.type,
-              previewId: +x.previewImage,
+              name: x.name ?? '',
+              url: x.url ?? '',
+              type: x.type ?? '',
+              preview: {
+                connect: {
+                  id: +x.previewImage,
+                },
+              },
             })),
           },
         },
@@ -344,7 +348,7 @@ export class LogoService {
       const companieArchives = await this.prisma.archives.createMany({
         data: sendArchive.archives.map((x) => ({
           companiesId: +sendArchive.companieId,
-          url: x.url,
+          url: x.url ?? '',
         })),
       });
 

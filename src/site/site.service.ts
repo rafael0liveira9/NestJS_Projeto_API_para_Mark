@@ -8,53 +8,6 @@ import { SelectLayoutDto } from './dto/select-layout.dto';
 export class SiteService {
   constructor(private prisma: PrismaService) {}
 
-  async toLayout(createSiteDto: CreateSiteDto) {
-    const service = await this.prisma.siteService.findUnique({
-      where: {
-        id: createSiteDto.id,
-      },
-    });
-
-    if (service.status != 3)
-      throw new HttpException(
-        {
-          Code: HttpStatus.CONFLICT,
-          Message: `Serviço já atualizado`,
-        },
-        HttpStatus.CONFLICT,
-      );
-
-    try {
-      const serviceData = await this.prisma.siteService.update({
-        where: {
-          id: createSiteDto.id,
-        },
-        data: {
-          status: 4,
-          SiteLayoutBase: {
-            create: createSiteDto.images.map((x) => ({
-              name: x.name,
-              layoutId: x.imageId,
-            })),
-          },
-        },
-      });
-
-      await this.prisma.$disconnect();
-
-      return serviceData;
-    } catch (error) {
-      await this.prisma.$disconnect();
-      throw new HttpException(
-        {
-          Code: HttpStatus.BAD_REQUEST,
-          Message: `Ocorreu um erro ao atualizar o serviço.`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
   async toPlan(createSiteDto: CreateSiteDto) {
     const service = await this.prisma.siteService.findUnique({
       where: {
@@ -96,10 +49,51 @@ export class SiteService {
     }
   }
 
-  async toShow(selectLayout: SelectLayoutDto, req) {
+  async toDefinition(createSiteDto: CreateSiteDto) {
     const service = await this.prisma.siteService.findUnique({
       where: {
-        id: selectLayout.id,
+        id: createSiteDto.id,
+      },
+    });
+
+    if (service.status != 3)
+      throw new HttpException(
+        {
+          Code: HttpStatus.CONFLICT,
+          Message: `Serviço já atualizado`,
+        },
+        HttpStatus.CONFLICT,
+      );
+
+    try {
+      const serviceData = await this.prisma.siteService.update({
+        where: {
+          id: createSiteDto.id,
+        },
+        data: {
+          status: 4,
+        },
+      });
+
+      await this.prisma.$disconnect();
+
+      return serviceData;
+    } catch (error) {
+      await this.prisma.$disconnect();
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Ocorreu um erro ao atualizar o serviço.`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async toLayout(createSiteDto: CreateSiteDto) {
+    const service = await this.prisma.siteService.findUnique({
+      where: {
+        id: createSiteDto.id,
       },
     });
 
@@ -115,10 +109,57 @@ export class SiteService {
     try {
       const serviceData = await this.prisma.siteService.update({
         where: {
-          id: selectLayout.id,
+          id: createSiteDto.id,
         },
         data: {
           status: 5,
+          SiteLayoutBase: {
+            create: createSiteDto.images.map((x) => ({
+              name: x.name,
+              layoutId: x.imageId,
+            })),
+          },
+        },
+      });
+
+      await this.prisma.$disconnect();
+
+      return serviceData;
+    } catch (error) {
+      await this.prisma.$disconnect();
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Ocorreu um erro ao atualizar o serviço.`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async toShow(selectLayout: SelectLayoutDto, req) {
+    const service = await this.prisma.siteService.findUnique({
+      where: {
+        id: selectLayout.id,
+      },
+    });
+
+    if (service.status != 5)
+      throw new HttpException(
+        {
+          Code: HttpStatus.CONFLICT,
+          Message: `Serviço já atualizado`,
+        },
+        HttpStatus.CONFLICT,
+      );
+
+    try {
+      const serviceData = await this.prisma.siteService.update({
+        where: {
+          id: selectLayout.id,
+        },
+        data: {
+          status: 6,
           SiteLayoutSelected: {
             create: {
               layoutId: selectLayout.imageId,
@@ -142,60 +183,16 @@ export class SiteService {
     }
   }
 
-  async saveShow(selectLayout: SelectLayoutDto, req) {
-    const service = await this.prisma.siteService.findUnique({
-      where: {
-        id: selectLayout.id,
-      },
-    });
-
-    await this.prisma.$disconnect();
-
-    if (service.status != 5)
-      throw new HttpException(
-        {
-          Code: HttpStatus.CONFLICT,
-          Message: `Serviço já atualizado`,
-        },
-        HttpStatus.CONFLICT,
-      );
-
-    try {
-      const serviceData = await this.prisma.siteService.update({
-        where: {
-          id: selectLayout.id,
-        },
-        data: {
-          status: 6,
-        },
-      });
-
-      await this.prisma.$disconnect();
-
-      return serviceData;
-    } catch (error) {
-      await this.prisma.$disconnect();
-
-      throw new HttpException(
-        {
-          Code: HttpStatus.BAD_REQUEST,
-          Message: `Ocorreu um erro ao atualizar o serviço.`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
   async setLayoutFinished(selectLayout: SelectLayoutDto, req) {
     const service = await this.prisma.siteService.findUnique({
       where: {
-        id: selectLayout.id,
+        id: +selectLayout.id,
       },
     });
 
     await this.prisma.$disconnect();
 
-    if (service.status > 7 || service.status < 6)
+    if (service.status < 6 && service.status > 8)
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -207,7 +204,7 @@ export class SiteService {
     try {
       const serviceData = await this.prisma.siteService.update({
         where: {
-          id: selectLayout.id,
+          id: +selectLayout.id,
         },
         data: {
           status: 7,
@@ -262,7 +259,7 @@ export class SiteService {
           id: selectLayout.id,
         },
         data: {
-          status: selectLayout.isApproved ? 8 : 7,
+          status: selectLayout.isApproved ? 9 : 8,
           SiteLayoutFinished: {
             update: {
               isApproved: selectLayout.isApproved,
@@ -297,7 +294,7 @@ export class SiteService {
 
     await this.prisma.$disconnect();
 
-    if (service.status != 8)
+    if (service.status != 9)
       throw new HttpException(
         {
           Code: HttpStatus.CONFLICT,
@@ -312,7 +309,7 @@ export class SiteService {
           id: selectLayout.id,
         },
         data: {
-          status: 9,
+          status: 10,
           isPublished: true,
         },
       });
@@ -339,7 +336,12 @@ export class SiteService {
         id,
       },
       include: {
-        SiteBriefing: true,
+        SiteBriefing: {
+          include: {
+            archives: true,
+            briefing: true,
+          },
+        },
         SiteLayoutBase: {
           include: {
             Layout: true,
