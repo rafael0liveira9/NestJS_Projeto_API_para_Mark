@@ -45,6 +45,8 @@ export class AuthService {
           name: params.name,
         });
 
+        if (!!costumerData.errors) throw new Error('Email incorreto');
+
         const clientData = await this.prisma.client.create({
           data: {
             name: params.name,
@@ -95,6 +97,7 @@ export class AuthService {
         );
       }
     } catch (error) {
+      console.log(error);
       await this.prisma.$disconnect();
       throw new HttpException(
         {

@@ -2,11 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   EspecificationTypes,
   FormatStyles,
-  MediaFormat,
-  NetworkTypes,
-  SocialImageBase,
-  SocialMaterialQuant,
-  SocialServiceTypes,
+  SocialMediaType,
 } from '@prisma/client';
 
 class CreateBriefingDefaultData {
@@ -72,15 +68,21 @@ export class CreateBriefingSiteDto extends CreateBriefingDefaultData {
 
 export class CreateBriefingSocialDto extends CreateBriefingDefaultData {
   @ApiProperty()
-  network: NetworkTypes;
+  materiaFormat: SocialMediaType;
   @ApiProperty()
-  image: SocialImageBase;
+  productImages: {
+    url: string;
+  }[];
   @ApiProperty()
-  materiaQuantity: SocialMaterialQuant;
-  @ApiProperty()
-  materiaFormat: MediaFormat;
-  @ApiProperty()
-  service: SocialServiceTypes;
+  weekDays: {
+    day: string;
+  }[];
   @ApiProperty()
   daysHours: string;
+  @ApiProperty()
+  mediaReference: string;
+  @ApiProperty()
+  socialTalk: string;
+  @ApiProperty()
+  socialProductText: string;
 }

@@ -302,25 +302,37 @@ export class BriefingService {
             status: 2,
             SocialBriefing: {
               create: {
-                networkType: createBriefingDto.network,
-                serviceType: createBriefingDto.service,
-                imageBase: createBriefingDto.image,
-                materialQuant: createBriefingDto.materiaQuantity,
                 daysHours: createBriefingDto.daysHours,
-                mediaFormat: createBriefingDto.materiaFormat,
+                socialTalk: createBriefingDto.socialTalk,
+                socilaProductText: createBriefingDto.socialProductText,
+                socialProductImages: {
+                  createMany: {
+                    data: createBriefingDto.productImages.map((x) => ({
+                      url: x.url,
+                    })),
+                    skipDuplicates: true,
+                  },
+                },
+                socialMediaReference: createBriefingDto.mediaReference,
+                mediaType: createBriefingDto.materiaFormat,
+                timesPerWeek: {
+                  createMany: {
+                    data: createBriefingDto.weekDays.map((x) => ({
+                      weekDay: x.day,
+                    })),
+                  },
+                },
               },
             },
           },
         });
+
         const serviceBriefingData = serviceBriefing.createdAt;
+
         serviceBriefingData.setMonth(
           serviceBriefingData.getMonth() + serviceBriefing.actualMonth,
         );
-        console.log(
-          `${data.Companies.companyName} / Logo / ${Utils.calendarMonths(
-            serviceBriefingData.getMonth(),
-          )}/${serviceBriefing.createdAt.getFullYear()}`,
-        );
+
         await this.asana.createTask(
           `${data.Companies.companyName} / Logo / ${Utils.calendarMonths(
             serviceBriefingData.getMonth(),
@@ -328,12 +340,23 @@ export class BriefingService {
           `
           BRIEFING:
 
-          Tipo de Network: ${createBriefingDto.network},
-          Tipo do Serviço: ${createBriefingDto.service},
-          Base das Imagens: ${createBriefingDto.image},
-          Quantidade de Material: ${createBriefingDto.materiaQuantity},
-          Horas e Dias: ${createBriefingDto.daysHours},
-          Formato da Media: ${createBriefingDto.materiaFormat},
+          Horas: ${createBriefingDto.daysHours},
+          Quantidade de Material e Dias e Horários: ${createBriefingDto.weekDays.map(
+            (x) => 'Dia da Semana: ' + x.day + '\n',
+          )}
+          O que devemos falar em sua rede social?: ${
+            createBriefingDto.socialTalk
+          },
+          Como você gostaria que fosse o seu material?: ${
+            createBriefingDto.materiaFormat
+          },
+          Imagens do Negócio/Produto/Serviço: ${createBriefingDto.productImages.map(
+            (x) => 'URL: ' + x.url + '\n',
+          )},
+          O que será falado em sua rede social: ${
+            createBriefingDto.socialProductText
+          },
+          Referencias: ${createBriefingDto.mediaReference}
         `,
         );
 

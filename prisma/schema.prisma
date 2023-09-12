@@ -276,6 +276,38 @@ model Service {
   ServiceType      ServiceType        @relation(fields: [serviceTypeId], references: [id])
   modelServiceId   Int?
   modelService     ServiceTypeChoose? @relation(fields: [modelServiceId], references: [id])
+  networkType      ServiceNetworks[]
+  ServicePosts     ServicePosts[]
+}
+
+model ServiceNetworks {
+  id                   Int                @id @default(autoincrement())
+  serviceId            Int
+  serviceNetworkTypeId Int
+  service              Service            @relation(fields: [serviceId], references: [id])
+  networkType          ServiceNetworkType @relation(fields: [serviceNetworkTypeId], references: [id])
+}
+
+model ServicePosts {
+  id                 Int              @id @default(autoincrement())
+  serviceId          Int
+  service            Service          @relation(fields: [serviceId], references: [id])
+  postType           ServicePostsType @relation(fields: [servicePostsTypeId], references: [id])
+  servicePostsTypeId Int
+}
+
+model ServiceNetworkType {
+  id              Int               @id @default(autoincrement())
+  name            String
+  createdAt       DateTime          @default(now())
+  ServiceNetworks ServiceNetworks[]
+}
+
+model ServicePostsType {
+  id           Int            @id @default(autoincrement())
+  name         String
+  createdAt    DateTime       @default(now())
+  ServicePosts ServicePosts[]
 }
 
 model ServiceType {
@@ -371,14 +403,37 @@ model SiteLayoutFinished {
 }
 
 model SocialBriefing {
-  id            Int                 @id @default(autoincrement())
-  networkType   NetworkTypes
-  serviceType   SocialServiceTypes
-  imageBase     SocialImageBase
-  materialQuant SocialMaterialQuant
-  daysHours     String
-  mediaFormat   MediaFormat
-  SocialService SocialService[]
+  id                   Int                   @id @default(autoincrement())
+  socialProductImages  SocialProductImages[]
+  socilaProductText    String?
+  socialTalk           String?
+  socialMediaReference Json?
+  mediaType            SocialMediaType?
+  timesPerWeek         SocialBriefingTimes[]
+  daysHours            String
+  SocialService        SocialService[]
+}
+
+enum SocialMediaType {
+  ELEMENT
+  PHOTO
+  ALL
+}
+
+model SocialBriefingTimes {
+  id               Int             @id @default(autoincrement())
+  weekDay          String
+  createdAt        DateTime        @default(now())
+  socialBriefingId Int?
+  SocialBriefing   SocialBriefing? @relation(fields: [socialBriefingId], references: [id])
+}
+
+model SocialProductImages {
+  id               Int             @id @default(autoincrement())
+  url              String
+  createdAt        DateTime        @default(now())
+  SocialBriefing   SocialBriefing? @relation(fields: [socialBriefingId], references: [id])
+  socialBriefingId Int?
 }
 
 model SocialContratedItems {
