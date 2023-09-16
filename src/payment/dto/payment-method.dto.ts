@@ -19,3 +19,9 @@ export class CreditCardDto {
   billingType: 'CREDIT_CARD';
   creditCard: CreditCard;
 }
+
+export class InvoiceDto {
+  @ApiProperty()
+  customer: string;
+  billingType: 'BOLETO';
+}

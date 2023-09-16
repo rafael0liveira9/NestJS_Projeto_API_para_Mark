@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import * as moment from 'moment';
 
 @Injectable()
 export class AsaasService {
@@ -6,10 +7,12 @@ export class AsaasService {
     email,
     name,
     phone,
+    document,
   }: {
     name: string;
     email: string;
     phone: string;
+    document: string;
   }) {
     try {
       const costumerData = await fetch(
@@ -23,6 +26,7 @@ export class AsaasService {
             name,
             phone,
             email,
+            cpfCnpj: document,
           }),
         },
       );
@@ -33,7 +37,7 @@ export class AsaasService {
     }
   }
 
-  async createPaymentCreditCard({
+  async createPayment({
     costumer,
     creditCard,
     dueDate,
@@ -43,6 +47,7 @@ export class AsaasService {
     userInfo,
     installments,
     valueInstall,
+    contractTime,
   }: {
     costumer?: string;
     dueDate: string;
@@ -51,7 +56,8 @@ export class AsaasService {
     externalReference: string;
     installments: number;
     valueInstall: number;
-    creditCard: {
+    contractTime?: number;
+    creditCard?: {
       holderName: string;
       number: string;
       expiryMonth: string;
@@ -67,42 +73,74 @@ export class AsaasService {
       phoneNumber: string;
     };
   }): Promise<Response> {
-    /* 
-    "installmentCount": 5,
-  "installmentValue": 20,
-    
-    */
+    let credit = {};
+
+    if (creditCard != null) {
+      credit = {
+        creditCard: {
+          holderName: creditCard.holderName,
+          number: creditCard.number,
+          expiryMonth: creditCard.expiryMonth,
+          expiryYear: creditCard.expiryYear,
+          ccv: creditCard.ccv,
+        },
+        creditCardHolderInfo: {
+          name: userInfo.name,
+          email: userInfo.email,
+          cpfCnpj: userInfo.cpf,
+          postalCode: userInfo.cep,
+          addressNumber: userInfo.addressNumber,
+          phone: userInfo.phoneNumber,
+        },
+      };
+    }
+
+    const body = {
+      customer: costumer,
+      billingType: creditCard != null ? 'CREDIT_CARD' : 'BOLETO',
+      dueDate: dueDate,
+      value: value,
+      description: description,
+      externalReference: externalReference,
+      installmentCount: installments,
+      installmentValue: valueInstall,
+      ...credit,
+    };
+
+    if (contractTime) {
+      delete body.installmentCount;
+      delete body.installmentValue;
+      try {
+        const data = await fetch(
+          `${process.env.ASAAS_URL}/api/v3/subscriptions`,
+          {
+            method: 'POST',
+            headers: {
+              access_token: process.env.ASAAS_TOKEN,
+            },
+            body: JSON.stringify({
+              ...body,
+              nextDueDate: moment().add(1, 'M').format('YYYY-MM-DD'),
+              cycle: 'MONTHLY',
+              maxPayments: contractTime,
+            }),
+          },
+        );
+
+        return data;
+      } catch (error) {
+        console.log(error);
+        return error;
+      }
+    }
+
     try {
       const data = await fetch(`${process.env.ASAAS_URL}/api/v3/payments`, {
         method: 'POST',
         headers: {
           access_token: process.env.ASAAS_TOKEN,
         },
-        body: JSON.stringify({
-          customer: costumer,
-          billingType: 'CREDIT_CARD',
-          dueDate: dueDate,
-          value: value,
-          description: description,
-          externalReference: externalReference,
-          installmentCount: installments,
-          installmentValue: valueInstall,
-          creditCard: {
-            holderName: creditCard.holderName,
-            number: creditCard.number,
-            expiryMonth: creditCard.expiryMonth,
-            expiryYear: creditCard.expiryYear,
-            ccv: creditCard.ccv,
-          },
-          creditCardHolderInfo: {
-            name: userInfo.name,
-            email: userInfo.email,
-            cpfCnpj: userInfo.cpf,
-            postalCode: userInfo.cep,
-            addressNumber: userInfo.addressNumber,
-            phone: userInfo.phoneNumber,
-          },
-        }),
+        body: JSON.stringify(body),
       });
 
       return data;

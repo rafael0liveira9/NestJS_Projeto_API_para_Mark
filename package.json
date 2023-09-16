@@ -37,6 +37,7 @@
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.4",
     "nest-router": "^1.0.9",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",

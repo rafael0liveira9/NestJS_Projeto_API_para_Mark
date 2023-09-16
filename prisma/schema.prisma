@@ -225,20 +225,32 @@ model PackagesServices {
 }
 
 model Payments {
-  id               Int                @id @default(autoincrement())
-  clientId         Int
-  companiesId      Int
-  value            Float
-  discount         Float?
-  voucherId        Int?
-  status           PaymentStatus
-  logGateway       Json
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime?
-  uuid             String             @unique
-  Client           Client             @relation(fields: [clientId], references: [id])
-  Companies        Companies          @relation(fields: [companiesId], references: [id])
-  PaymentsServices PaymentsServices[]
+  id                    Int                     @id @default(autoincrement())
+  uuid                  String                  @unique
+  clientId              Int
+  companiesId           Int
+  value                 Float
+  discount              Float?
+  subscription          Boolean?                @default(false)
+  voucherId             Int?
+  status                PaymentStatus
+  logGateway            Json
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime?
+  Client                Client                  @relation(fields: [clientId], references: [id])
+  Companies             Companies               @relation(fields: [companiesId], references: [id])
+  PaymentsServices      PaymentsServices[]
+  PaymentsSubscriptions PaymentsSubscriptions[]
+}
+
+model PaymentsSubscriptions {
+  id           Int       @id @default(autoincrement())
+  paymentsUuid String
+  status       Int       @default(1)
+  dueDate      DateTime
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime?
+  payment      Payments  @relation(fields: [paymentsUuid], references: [uuid])
 }
 
 model PaymentsServices {

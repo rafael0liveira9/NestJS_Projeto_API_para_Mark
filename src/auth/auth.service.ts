@@ -43,6 +43,7 @@ export class AuthService {
           email: params.email,
           phone: params.phone,
           name: params.name,
+          document: params.document.replace(/\D/gm, ''),
         });
 
         if (!!costumerData.errors) throw new Error('Email incorreto');
@@ -184,7 +185,7 @@ export class AuthService {
     params: UserDefault,
   ): Promise<EmployeeJToken | ClientJToken | ErrorReturn> {
     try {
-      let userExist = await this.prisma.client.findFirst({
+      const userExist = await this.prisma.client.findFirst({
         where: {
           User: {
             email: params.email,
@@ -221,13 +222,13 @@ export class AuthService {
             );
           }
           if (result) {
-            var token = this.jwt.signJwt({
+            const token = this.jwt.signJwt({
               id: userExist.id,
               userId: userExist.User.id,
               roleType: userExist.User.roleTypeId,
             });
 
-            let userExistData = await this.prisma.client.findFirst({
+            const userExistData = await this.prisma.client.findFirst({
               where: {
                 User: {
                   email: params.email,
@@ -258,7 +259,7 @@ export class AuthService {
           );
         }
       } else {
-        let userSecond = await this.prisma.employee.findFirst({
+        const userSecond = await this.prisma.employee.findFirst({
           where: {
             User: {
               email: params.email,
@@ -295,13 +296,13 @@ export class AuthService {
               );
             }
             if (result) {
-              var token = this.jwt.signJwt({
+              const token = this.jwt.signJwt({
                 id: userSecond.id,
                 userId: userSecond.User.id,
                 roleType: userSecond.User.roleTypeId,
               });
 
-              let userSecondData = await this.prisma.employee.findFirst({
+              const userSecondData = await this.prisma.employee.findFirst({
                 where: {
                   User: {
                     email: params.email,

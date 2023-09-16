@@ -309,7 +309,7 @@ export class CompanieService {
         HttpStatus.NOT_FOUND,
       );
 
-    let itens = await this.prisma.archives.findMany({
+    const itens = await this.prisma.archives.findMany({
       where: {
         companiesId: clientData.Companie.id,
       },

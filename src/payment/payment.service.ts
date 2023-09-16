@@ -6,11 +6,13 @@ import { AsaasService } from 'src/singleServices/asaas.service';
 import { Client, Companies, User } from '@prisma/client';
 
 import { v4 as uuidv4 } from 'uuid';
-import { AsanaService } from 'src/singleServices/asana.service';
+import * as moment from 'moment';
 
 @Injectable()
 export class PaymentService {
   constructor(private prisma: PrismaService, private asaas: AsaasService) {}
+
+  private contracts = [3, 6, 12];
 
   async checkout(createPaymentDto: CreatePaymentDto, @Req() req) {
     let valueTotal = { price: 0, value: 0 };
@@ -27,6 +29,15 @@ export class PaymentService {
       value: number;
     },
   ) {
+    if (this.contracts.indexOf(createPaymentDto.contractTime) == -1) {
+      throw new HttpException(
+        {
+          Code: HttpStatus.NOT_FOUND,
+          Message: 'Selecione um tempo de contrato válido.',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
     const clientData = await this.prisma.client.findUnique({
       where: {
         id: req.id,
@@ -37,25 +48,57 @@ export class PaymentService {
       },
     });
 
+    let apiMethod = {};
+
+    if (createPaymentDto.paymentMethod.billingType == 'CREDIT_CARD') {
+      if (!createPaymentDto.paymentMethod.creditCard) {
+        throw new HttpException(
+          {
+            Code: HttpStatus.BAD_REQUEST,
+            Message: 'Necessario enviar dados do cartão de crédito.',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      if (
+        !createPaymentDto.paymentMethod.creditCard.holderName ||
+        !createPaymentDto.paymentMethod.creditCard.number ||
+        !createPaymentDto.paymentMethod.creditCard.expiryMonth ||
+        !createPaymentDto.paymentMethod.creditCard.expiryYear ||
+        !createPaymentDto.paymentMethod.creditCard.ccv
+      ) {
+        throw new HttpException(
+          {
+            Code: HttpStatus.BAD_REQUEST,
+            Message: 'Necessario enviar dados do cartão de crédito.',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      apiMethod = {
+        creditCard: {
+          holderName: createPaymentDto.paymentMethod.creditCard.holderName,
+          number: createPaymentDto.paymentMethod.creditCard.number,
+          expiryMonth: createPaymentDto.paymentMethod.creditCard.expiryMonth,
+          expiryYear: createPaymentDto.paymentMethod.creditCard.expiryYear,
+          ccv: createPaymentDto.paymentMethod.creditCard.ccv,
+        },
+      };
+    }
+
     if (clientData.Companie) {
       const uuidPayment = uuidv4();
 
       try {
-        const payment = await this.asaas.createPaymentCreditCard({
+        const payment = await this.asaas.createPayment({
           costumer: clientData.costumerId,
-          dueDate: '2023-10-05',
+          dueDate: moment().add(7, 'd').format('YYYY-MM-DD'),
           value: valueTotal.price,
           description: 'Produto comprado',
           externalReference: `${uuidPayment}`,
           valueInstall: valueTotal.value,
           installments: createPaymentDto.installments,
-          creditCard: {
-            holderName: createPaymentDto.paymentMethod.creditCard.holderName,
-            number: createPaymentDto.paymentMethod.creditCard.number,
-            expiryMonth: createPaymentDto.paymentMethod.creditCard.expiryMonth,
-            expiryYear: createPaymentDto.paymentMethod.creditCard.expiryYear,
-            ccv: createPaymentDto.paymentMethod.creditCard.ccv,
-          },
+          contractTime: createPaymentDto.contractTime,
           userInfo: {
             name: clientData.Companie.companyName,
             email: clientData.User.email,
@@ -64,6 +107,7 @@ export class PaymentService {
             cep: clientData.cep,
             cpf: clientData.document,
           },
+          ...apiMethod,
         });
 
         await this.prisma.$disconnect();
@@ -74,8 +118,12 @@ export class PaymentService {
           valueTotal.price,
           await payment.json(),
           uuidPayment,
+          undefined,
+          undefined,
+          !!createPaymentDto.contractTime,
         );
       } catch (error) {
+        console.log(error);
         await this.prisma.$disconnect();
         throw new HttpException(
           {
@@ -98,7 +146,7 @@ export class PaymentService {
   }
 
   private async finishCheckout(uuid: string) {
-    let socialServices = [],
+    const socialServices = [],
       logoServices = [],
       siteServices = [];
 
@@ -116,7 +164,7 @@ export class PaymentService {
       },
     });
 
-    let userContratedService = await this.prisma.contratedService.upsert({
+    const userContratedService = await this.prisma.contratedService.upsert({
       where: {
         companiesId: paymentData.companiesId,
       },
@@ -530,7 +578,7 @@ export class PaymentService {
           value: serviceData.price / createPaymentDto.installments ?? 1,
         };
       } else {
-        let servicesLocal = [];
+        const servicesLocal = [];
         let total = 0;
 
         for (let i = 0; i < createPaymentDto.service.length; i++) {
@@ -600,6 +648,7 @@ export class PaymentService {
     uuid: string,
     discount?: number,
     voucherId?: number,
+    isSubscription?: boolean,
   ) {
     const data = await this.prisma.payments.create({
       data: {
@@ -612,6 +661,7 @@ export class PaymentService {
         status: 'WAITING',
         logGateway: JSON.stringify(paymentData),
         updatedAt: new Date(),
+        subscription: isSubscription,
         PaymentsServices: {
           create: createPaymentDto.service
             ? typeof createPaymentDto.service == 'number'
