@@ -524,6 +524,7 @@ export class PaymentService {
   }
 
   async webhookPayment(req: any) {
+    console.log('-------------------->', req);
     try {
       if (req.payment.status == 'RECEIVED') {
         await this.prisma.payments.update({
