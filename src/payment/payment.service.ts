@@ -527,6 +527,7 @@ export class PaymentService {
     console.log('-------------------->', req);
     try {
       if (req.payment.status == 'RECEIVED') {
+        if (!req.payment.externalReference) return 'OK';
         await this.prisma.payments.update({
           where: {
             uuid: req.payment.externalReference,
@@ -541,6 +542,7 @@ export class PaymentService {
       await this.prisma.$disconnect();
       return 'OK';
     } catch (error) {
+      console.log(error);
       throw new HttpException(
         {
           Code: HttpStatus.BAD_REQUEST,
