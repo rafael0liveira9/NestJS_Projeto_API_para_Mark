@@ -182,14 +182,10 @@ export class PackagesService {
             : null,
           PackagesServices: {
             connectOrCreate: updatePackageDto.servicesUp.map((x) => {
-              let idData = {};
-
-              if (x.id) {
-                idData = { id: x.id };
-              }
-
               return {
-                where: idData,
+                where: {
+                  id: x.id,
+                },
                 create: {
                   serviceId: x.service,
                 },
