@@ -159,6 +159,27 @@ export class UserService {
     return !!findedUser;
   }
 
+  async arrears(id: number) {
+    try {
+      const user = await this.prisma.client.update({
+        where: { id: id },
+        data: {
+          defaulter: true,
+        },
+      });
+
+      return;
+    } catch (error) {
+      throw new HttpException(
+        {
+          Code: HttpStatus.BAD_REQUEST,
+          Message: `Usuário não encontrado`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   remove(id: number) {
     return `This action removes a #${id} user`;
   }

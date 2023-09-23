@@ -57,6 +57,12 @@ export class UserController {
     return this.userService.updatePassword(UpdatePasswordDto);
   }
 
+  @Put('arrears/:id')
+  @HttpCode(200)
+  arrears(@Param('id') id: string) {
+    return this.userService.arrears(+id);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);

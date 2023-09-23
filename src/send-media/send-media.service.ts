@@ -15,7 +15,7 @@ export class SendImagesService {
   async create(image: Express.Multer.File) {
     try {
       console.log(image);
-      let imageUploaded = await this.uploader.client
+      const imageUploaded = await this.uploader.client
         .upload({
           Bucket: process.env.AWS_S3_BUCKET_NAME,
           Key: Utils.slugfy(

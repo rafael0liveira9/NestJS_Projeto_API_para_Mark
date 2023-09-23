@@ -4,7 +4,7 @@ import {
   Injectable,
   NestMiddleware,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { JwtService } from '../singleServices/jwt.service';
 import { PrismaService } from 'src/singleServices/prisma.service';
 
@@ -18,7 +18,7 @@ interface RequestAuth extends Request {
 export class AuthenticationAdminMiddleware implements NestMiddleware {
   constructor(private jwt: JwtService, private prisma: PrismaService) {}
 
-  async use(req: RequestAuth, res: Response, next: Function) {
+  async use(req: RequestAuth, res: Response, next: NextFunction) {
     try {
       const jwtData = await this.jwt.readJwt({
         token: req.headers.authorization,

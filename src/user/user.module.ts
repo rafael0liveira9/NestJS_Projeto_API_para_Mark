@@ -21,6 +21,7 @@ export class UserModule {
         { path: '/user/:id', method: RequestMethod.GET },
         { path: '/user/:id', method: RequestMethod.PATCH },
         { path: '/user/:id', method: RequestMethod.DELETE },
+        { path: '/user/arrears/:id', method: RequestMethod.PUT },
       );
   }
 }

@@ -29,15 +29,16 @@ export class PaymentService {
       value: number;
     },
   ) {
-    if (this.contracts.indexOf(createPaymentDto.contractTime) == -1) {
-      throw new HttpException(
-        {
-          Code: HttpStatus.NOT_FOUND,
-          Message: 'Selecione um tempo de contrato válido.',
-        },
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    if (createPaymentDto.contractTime)
+      if (this.contracts.indexOf(createPaymentDto.contractTime) == -1) {
+        throw new HttpException(
+          {
+            Code: HttpStatus.NOT_FOUND,
+            Message: 'Selecione um tempo de contrato válido.',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
     const clientData = await this.prisma.client.findUnique({
       where: {
         id: req.id,
@@ -47,6 +48,16 @@ export class PaymentService {
         User: true,
       },
     });
+
+    if (clientData.defaulter) {
+      throw new HttpException(
+        {
+          Code: HttpStatus.UNAUTHORIZED,
+          Message: 'Usuário Inadimplente',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
 
     let apiMethod = {};
 

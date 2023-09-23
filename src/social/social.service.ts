@@ -162,14 +162,14 @@ export class SocialService {
       },
     });
 
-    if (socialServiceStatus.status >= 8 && socialServiceStatus.status <= 10) {
+    if (socialServiceStatus.status >= 7 && socialServiceStatus.status <= 10) {
       try {
         const socialUpdateSocial = await this.prisma.socialService.update({
           where: {
             id: updateShow.id,
           },
           data: {
-            status: 9,
+            status: 8,
             SocialShow: {
               update: {
                 allApproved: updateShow.allApproved,
@@ -184,7 +184,7 @@ export class SocialService {
                       text: x.text,
                       type: x.type,
                       imagesId: x.image,
-                      approved: x.approved,
+                      approved: undefined,
                       reasonRefuse: x.reasonRefuse,
                     },
                   })),
@@ -234,6 +234,7 @@ export class SocialService {
         id: updateShow.id,
       },
     });
+    // console.log(updateShow, socialServiceStatus);
 
     if (socialServiceStatus.status >= 4 && socialServiceStatus.status < 7) {
       try {
@@ -258,10 +259,10 @@ export class SocialService {
                     data: {
                       text: x.text,
                       type: x.type,
-                      imagesId: x.image,
                       approved: userData.roleTypeId > 1 ? false : x.approved,
                       reasonRefuse:
                         userData.roleTypeId > 1 ? '' : x.reasonRefuse,
+                      // comments: x.comments,
                     },
                   })),
                 },
@@ -279,6 +280,7 @@ export class SocialService {
 
         return socialUpdateService;
       } catch (error) {
+        console.log(error);
         await this.prisma.$disconnect();
         throw new HttpException(
           {
@@ -459,7 +461,12 @@ export class SocialService {
             },
           },
         },
-        SocialBriefing: true,
+        SocialBriefing: {
+          include: {
+            timesPerWeek: true,
+            socialProductImages: true,
+          },
+        },
       },
     });
 

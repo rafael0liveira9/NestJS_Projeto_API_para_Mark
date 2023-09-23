@@ -21,4 +21,6 @@ class SocialFeed {
   reasonRefuse?: string;
   @ApiProperty()
   image?: number;
+  @ApiProperty()
+  comments?: string;
 }

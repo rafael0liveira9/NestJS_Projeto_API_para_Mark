@@ -37,12 +37,14 @@ model Client {
   createdAt        DateTime           @default(now())
   updatedAt        DateTime?
   userId           Int                @unique
+  defaulter        Boolean?           @default(false)
   companiesId      Int?
   Companie         Companies?         @relation("companie", fields: [companiesId], references: [id])
   User             User               @relation(fields: [userId], references: [id])
   Companies        Companies[]        @relation("owner")
   Payments         Payments[]
   PaymentsServices PaymentsServices[]
+  SocialFeedShow   SocialFeedShow[]
 }
 
 model Companies {
@@ -475,6 +477,7 @@ model SocialService {
 model SocialShow {
   id               Int              @id @default(autoincrement())
   allApproved      Boolean?
+  comments         String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime?
   isRefused        Boolean          @default(false)
@@ -489,10 +492,13 @@ model SocialFeedShow {
   type         SocialFeedShowType
   approved     Boolean?
   reasonRefuse String?
+  comments     String?
   socialShowId Int?
   imagesId     Int?
   Images       Images?            @relation(fields: [imagesId], references: [id])
   SocialShow   SocialShow?        @relation(fields: [socialShowId], references: [id])
+  clientId     Int?
+  editBy       Client?            @relation(fields: [clientId], references: [id])
 }
 
 model Tables {
