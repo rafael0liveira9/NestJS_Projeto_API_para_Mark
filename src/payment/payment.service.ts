@@ -664,6 +664,25 @@ export class PaymentService {
     voucherId?: number,
     isSubscription?: boolean,
   ) {
+    console.log(
+      createPaymentDto.service
+        ? typeof createPaymentDto.service == 'number'
+          ? {
+              clientId: clientData.id,
+              companiesId: clientData.Companie.id,
+              serviceId: createPaymentDto.service,
+            }
+          : createPaymentDto.service.map((x) => ({
+              clientId: clientData.id,
+              companiesId: clientData.Companie.id,
+              serviceId: x,
+            }))
+        : {
+            clientId: clientData.id,
+            companiesId: clientData.Companie.id,
+            serviceId: createPaymentDto.package,
+          },
+    );
     const data = await this.prisma.payments.create({
       data: {
         uuid,
@@ -692,7 +711,7 @@ export class PaymentService {
             : {
                 clientId: clientData.id,
                 companiesId: clientData.Companie.id,
-                serviceId: createPaymentDto.package,
+                packagesId: createPaymentDto.package,
               },
         },
       },
