@@ -22,7 +22,7 @@ export class ServiceService {
         modelService: {
           connectOrCreate: {
             where: {
-              id: createServiceDto.modelId,
+              id: createServiceDto.modelId ?? 0,
             },
             create: {
               name: createServiceDto.model.name,
