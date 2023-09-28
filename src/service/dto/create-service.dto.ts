@@ -12,6 +12,7 @@ export class CreateServiceDto {
   @ApiProperty()
   model: {
     name: string;
+    id: string;
   };
   @ApiProperty()
   modelId: number;

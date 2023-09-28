@@ -26,6 +26,11 @@ export class ServiceController {
     return this.serviceService.findAll(query);
   }
 
+  @Get('service-choose')
+  findAllServicesChoose() {
+    return this.serviceService.getAll();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.serviceService.findOne(+id);

@@ -26,6 +26,7 @@ export class ServiceService {
             },
             create: {
               name: createServiceDto.model.name,
+              serviceTypeId: createServiceDto.serviceTypeId,
             },
           },
         },
@@ -35,6 +36,12 @@ export class ServiceService {
     await this.prisma.$disconnect();
 
     return serviceAdded;
+  }
+
+  async getAll() {
+    const data = await this.prisma.serviceTypeChoose.findMany({});
+    await this.prisma.$disconnect();
+    return data;
   }
 
   async findAll({
