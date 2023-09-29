@@ -8,6 +8,7 @@ export class ServiceService {
   constructor(private prisma: PrismaService) {}
 
   async create(createServiceDto: CreateServiceDto) {
+    console.log(createServiceDto);
     const serviceAdded = await this.prisma.service.create({
       data: {
         name: createServiceDto.name,
@@ -25,8 +26,8 @@ export class ServiceService {
               id: createServiceDto.modelId ?? 0,
             },
             create: {
-              name: createServiceDto.model.name,
-              serviceTypeId: createServiceDto.serviceTypeId,
+              name: createServiceDto?.model?.name ?? '',
+              serviceTypeId: createServiceDto?.serviceTypeId,
             },
           },
         },
