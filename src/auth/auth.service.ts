@@ -184,6 +184,7 @@ export class AuthService {
   async userLogin(
     params: UserDefault,
   ): Promise<EmployeeJToken | ClientJToken | ErrorReturn> {
+    console.log(params);
     try {
       const userExist = await this.prisma.client.findFirst({
         where: {
@@ -204,6 +205,8 @@ export class AuthService {
           },
         },
       });
+
+      console.log(userExist);
 
       if (userExist) {
         if (userExist.User.deletedAt == null) {
@@ -347,6 +350,7 @@ export class AuthService {
         }
       }
     } catch (error) {
+      console.log(error);
       await this.prisma.$disconnect();
       throw new HttpException(
         {
