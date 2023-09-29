@@ -76,6 +76,9 @@ export class PackagesService {
   async findByValues(packageSearch: PackagesSearch) {
     try {
       let data = await this.prisma.packages.findMany({
+        where: {
+          deletedAt: null,
+        },
         include: {
           PackagesServices: {
             include: {
