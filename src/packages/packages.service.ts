@@ -14,7 +14,9 @@ export class PackagesService {
           name: createPackageDto.name,
           price: createPackageDto.price,
           description: createPackageDto.description,
-          dueDate: new Date(Date.parse(createPackageDto.dueDate)),
+          dueDate: createPackageDto.dueDate
+            ? new Date(Date.parse(createPackageDto.dueDate))
+            : new Date(2099, 11, 31),
           PackagesServices: {
             create: createPackageDto.services.map((x) => ({
               serviceId: x,
