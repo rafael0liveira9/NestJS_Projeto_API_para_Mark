@@ -206,8 +206,6 @@ export class AuthService {
         },
       });
 
-      console.log(userExist);
-
       if (userExist) {
         if (userExist.User.deletedAt == null) {
           const result = bcrypt.compareSync(
@@ -238,6 +236,7 @@ export class AuthService {
                 },
               },
               include: {
+                Companie: true,
                 User: {
                   select: {
                     id: true,
