@@ -15,10 +15,12 @@ export class PaymentService {
   private contracts = [3, 6, 12];
 
   async checkout(createPaymentDto: CreatePaymentDto, @Req() req) {
+    console.log(createPaymentDto);
     let valueTotal = { price: 0, value: 0 };
     valueTotal = await this.calculateValue(createPaymentDto);
+    console.log(valueTotal);
 
-    return this.checkoutPayment(createPaymentDto, req, valueTotal);
+    return await this.checkoutPayment(createPaymentDto, req, valueTotal);
   }
 
   private async checkoutPayment(
@@ -535,7 +537,6 @@ export class PaymentService {
   }
 
   async webhookPayment(req: any) {
-    console.log('-------------------->', req);
     try {
       if (req.payment.status == 'RECEIVED') {
         if (!req.payment.externalReference) return 'OK';
@@ -664,25 +665,37 @@ export class PaymentService {
     voucherId?: number,
     isSubscription?: boolean,
   ) {
-    console.log(
-      createPaymentDto.service
-        ? typeof createPaymentDto.service == 'number'
-          ? {
+    console.log({
+      uuid,
+      clientId: clientData.id,
+      companiesId: clientData.Companie.id,
+      value: totalVal,
+      discount: discount,
+      voucherId,
+      status: 'WAITING',
+      logGateway: JSON.stringify(paymentData),
+      updatedAt: new Date(),
+      subscription: isSubscription,
+      PaymentsServices: {
+        create: createPaymentDto.service
+          ? typeof createPaymentDto.service == 'number'
+            ? {
+                clientId: clientData.id,
+                companiesId: clientData.Companie.id,
+                serviceId: createPaymentDto.service,
+              }
+            : createPaymentDto.service.map((x) => ({
+                clientId: clientData.id,
+                companiesId: clientData.Companie.id,
+                serviceId: x,
+              }))
+          : {
               clientId: clientData.id,
               companiesId: clientData.Companie.id,
-              serviceId: createPaymentDto.service,
-            }
-          : createPaymentDto.service.map((x) => ({
-              clientId: clientData.id,
-              companiesId: clientData.Companie.id,
-              serviceId: x,
-            }))
-        : {
-            clientId: clientData.id,
-            companiesId: clientData.Companie.id,
-            serviceId: createPaymentDto.package,
-          },
-    );
+              packagesId: createPaymentDto.package,
+            },
+      },
+    });
     const data = await this.prisma.payments.create({
       data: {
         uuid,
