@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -160,11 +161,17 @@ export class UserService {
   }
 
   async arrears(id: number) {
+    const userData = await this.prisma.client.findUnique({
+      where: {
+        id,
+      },
+    });
+
     try {
       const user = await this.prisma.client.update({
         where: { id: id },
         data: {
-          defaulter: true,
+          defaulter: !userData.defaulter ?? false,
         },
       });
 
