@@ -16,9 +16,11 @@ export class UserService {
   }
 
   async findAll() {
-    const data = await this.prisma.user.findMany({
+    const data = await this.prisma.client.findMany({
       where: {
-        deletedAt: null,
+        User: {
+          deletedAt: null,
+        },
       },
     });
     await this.prisma.$disconnect();
